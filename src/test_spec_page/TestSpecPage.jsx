@@ -3,20 +3,20 @@ import {observer} from "mobx-react";
 import {observable} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
 import TestTree from "./TestTree";
-
-
-const {Sider} = Layout;
+import {Tabs, Button} from "antd";
+import TabbedPanel from "./TabbedPanel";
 
 class TestSpecPage extends Component {
+
     render() {
         return (
             <Layout>
-                <Sider width={200} style={{background: "#fff", height: "calc(100% - 64px)"}}>
+                <Layout.Sider width={200} style={{background: "#fff", height: "calc(100% - 64px)"}}>
                     <TestTree/>
-                </Sider>
-                <Layout style={{padding: "0 24px 24px"}}>
-
-                </Layout>
+                </Layout.Sider>
+                <Layout.Content>
+                    <TabbedPanel/>
+                </Layout.Content>
             </Layout>
         );
     }

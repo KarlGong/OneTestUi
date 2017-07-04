@@ -7,7 +7,7 @@ import axios from "axios"
 
 @observer
 class TestTree extends Component {
-    state = new TestTreeState();
+    myState = new TestTreeState();
 
     componentWillMount() {
         let self = this;
@@ -16,7 +16,7 @@ class TestTree extends Component {
                 projectId: 1
             }
         }).then(function (response) {
-            self.state.treeData.push(response.data);
+            self.myState.treeData.push(response.data);
         })
     }
 
@@ -45,7 +45,7 @@ class TestTree extends Component {
                 onDragEnter={this.onDragEnter}
                 onDrop={this.onDrop}
             >
-                {loop(this.state.treeData)}
+                {loop(this.myState.treeData)}
             </Tree>
         );
     }
@@ -55,7 +55,7 @@ class TestTree extends Component {
         return new Promise((resolve) => {
             axios.get("/api/suite/" + treeNode.props.data.id + "/children")
                 .then(function (response) {
-                    self.state.addChildren(treeNode.props.data, response.data);
+                    self.myState.addChildren(treeNode.props.data, response.data);
                     resolve();
                 });
         })
