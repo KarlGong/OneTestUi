@@ -2,31 +2,37 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
-import TestTreeState from "./TestTreeState";
 import axios from "axios";
 import {Tabs, Button} from "antd";
-import TabbedPanelState from "./TabbedPanelState";
+import state from "./State";
+import "./TabbedPanel.css";
 
 @observer
 class TabbedPanel extends Component {
-    myState = new TabbedPanelState();
 
     render() {
-        return (
-            <Tabs
-                hideAdd
-                type="editable-card"
-                onEdit={this.onEdit.bind(this)}
-            >
-                {this.myState.panels.map(panel => <Tabs.TabPane tab={panel.title}
-                                                                key={panel.key}>{panel.content}</Tabs.TabPane>)}
-            </Tabs>
+        return (<div class="right-panel">{state.panels.length ?
+                <Tabs
+                    hideAdd
+                    type="editable-card"
+                    activeKey={state.activePanelKey}
+                    onChange={this.onChange.bind(this)}
+                    onEdit={this.onEdit.bind(this)}
+                >
+                    {state.panels.map(panel =>
+                        <Tabs.TabPane tab={panel.title} key={panel.key}>{panel.content}</Tabs.TabPane>)}
+                </Tabs> : <div class="info-text">Select TestCase / TestSuite in left panel.</div>}
+            </div>
         );
     }
 
-    onEdit(targetKey, action) {
+    onChange(key) {
+        state.selectPanel(key);
+    }
+
+    onEdit(key, action) {
         if (action === "remove") {
-            this.myState.removePanel(targetKey);
+            state.removePanel(key);
         }
     }
 }

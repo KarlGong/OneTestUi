@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import {Layout, Menu, Breadcrumb, Icon} from "antd";
-import TestSpecPage from "./test_spec_page/TestSpecPage";
+import TestSpecPage from "./test_spec_page/Index";
 
 
 const {SubMenu} = Menu;
