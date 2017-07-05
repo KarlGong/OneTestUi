@@ -27,7 +27,8 @@ module.exports = {
     resolve: {
         extensions: [".js", ".jsx"],
         alias: {
-            event: path.join(__dirname, "app/utils/Event.js")
+            event: path.join(__dirname, "app/utils/Event.js"),
+            shared: path.join(__dirname, "app/shared")
         }
     },
     module: {
@@ -50,7 +51,6 @@ module.exports = {
                     {
                         loader: "less-loader",
                         query: {
-                            "sourceMap": true,
                             "modifyVars": {
                                 "@icon-url": "'/app/assets/fonts/iconfont/iconfont'"
                             }

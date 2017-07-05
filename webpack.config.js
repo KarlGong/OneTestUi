@@ -26,7 +26,8 @@ module.exports = {
     resolve: {
         extensions: [".js", ".jsx"],
         alias: {
-            event: path.join(__dirname, "app/utils/Event.js")
+            event: path.join(__dirname, "app/utils/Event.js"),
+            shared: path.join(__dirname, "app/shared")
         }
     },
     module: {

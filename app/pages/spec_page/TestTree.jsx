@@ -11,11 +11,10 @@ export default class TestTree extends Component {
     @observable loading = false;
 
     componentWillMount() {
-        self = this;
         this.loading = true;
-        axios.get("/api/project/1/rootsuite").then(function (response) {
-            self.loading = false;
-            self.treeData.push(response.data);
+        axios.get("/api/project/1/rootsuite").then((response) => {
+            this.loading = false;
+            this.treeData.push(response.data);
         })
     }
 
@@ -36,18 +35,18 @@ export default class TestTree extends Component {
         return (
             <Spin spinning={this.loading}>
                 <div style={{height: "100%"}}>
-                <Tree
-                    class="draggable-tree"
-                    draggable
-                    showLine
-                    showicon
-                    loadData={this.loadChildren.bind(this)}
-                    onDragEnter={this.onDragEnter}
-                    onDrop={this.onDrop}
-                    onSelect={this.handleSelect.bind(this)}
-                >
-                    {loop(this.treeData)}
-                </Tree>
+                    <Tree
+                        class="draggable-tree"
+                        draggable
+                        showLine
+                        showicon
+                        loadData={this.loadChildren.bind(this)}
+                        onDragEnter={this.onDragEnter}
+                        onDrop={this.onDrop}
+                        onSelect={this.handleSelect.bind(this)}
+                    >
+                        {loop(this.treeData)}
+                    </Tree>
                 </div>
             </Spin>
         );
@@ -66,7 +65,13 @@ export default class TestTree extends Component {
     handleSelect(selectedKeys, e) {
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
-            event.emit("TabbedPanel.addPanel", testNode.name, e.node.props.eventKey);
+            event.emit("TabbedPanel.addPanel",
+                {
+                    name: testNode.name,
+                    key: e.node.props.eventKey,
+                    data: testNode
+                }
+            );
         }
     }
 }

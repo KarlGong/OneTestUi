@@ -4,7 +4,7 @@ import {observable} from "mobx";
 import axios from "axios";
 import {Tabs, Button} from "antd";
 import event from "event";
-import "./TabbedPanel.css";
+import TestCaseEditor from "./TestCaseEditor";
 
 @observer
 export default class TabbedPanel extends Component {
@@ -26,8 +26,8 @@ export default class TabbedPanel extends Component {
                     onEdit={this.removePanel.bind(this)}
                 >
                     {this.panels.map(panel =>
-                        <Tabs.TabPane tab={panel.title} key={panel.key}>{panel.content}</Tabs.TabPane>)}
-                </Tabs> : <div className="info-text">Select TestCase / TestSuite in left panel.</div>}
+                        <Tabs.TabPane tab={panel.name} key={panel.key}><TestCaseEditor testCaseId={panel.data.id}/></Tabs.TabPane>)}
+                </Tabs> : <div style={{fontSize: "20px", marginTop: "50px", textAlign: "center"}}>Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
     }
@@ -36,13 +36,12 @@ export default class TabbedPanel extends Component {
         this.activePanelKey = key;
     }
 
-    addPanel(title, key) {
-        this.activePanelKey = key;
-        let newPanel = {title, key};
+    addPanel(panel) {
+        this.activePanelKey = panel.key;
         for (let i = 0; i < this.panels.length; i++) {
-            if (this.panels[i].key === newPanel.key) return;
+            if (this.panels[i].key === panel.key) return;
         }
-        this.panels.push(newPanel);
+        this.panels.push(panel);
     }
 
     removePanel(key, action) {
