@@ -5,14 +5,11 @@ import {Layout, Menu, Breadcrumb, Icon} from "antd";
 import TestSpecPage from "./test_spec_page/Index";
 
 
-const {SubMenu} = Menu;
-const {Header, Content, Sider} = Layout;
-
 class App extends Component {
     render() {
         return (
             <Layout>
-                <Header className="header">
+                <Layout.Header className="header">
                     <div className="logo"/>
                     <Menu
                         theme="dark"
@@ -24,7 +21,7 @@ class App extends Component {
                         <Menu.Item key="2">Test Execution</Menu.Item>
                         <Menu.Item key="3">Test Reports</Menu.Item>
                     </Menu>
-                </Header>
+                </Layout.Header>
                 <TestSpecPage/>
             </Layout>
         );

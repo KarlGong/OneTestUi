@@ -8,11 +8,7 @@ import state from "./State";
 @observer
 class TestTree extends Component {
     componentWillMount() {
-        axios.get("/api/suite/root", {
-            params: {
-                projectId: 1
-            }
-        }).then(function (response) {
+        axios.get("/api/project/1/rootsuite").then(function (response) {
             state.treeData.push(response.data);
         })
     }
