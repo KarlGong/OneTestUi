@@ -1,15 +1,18 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable} from "mobx";
+import {observable, action} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
 import axios from "axios";
-import state from "./State";
+import event from "event";
 
 @observer
-class TestTree extends Component {
+export default class TestTree extends Component {
+    @observable treeData = [];
+
     componentWillMount() {
+        self = this;
         axios.get("/api/project/1/rootsuite").then(function (response) {
-            state.treeData.push(response.data);
+            self.treeData.push(response.data);
         })
     }
 
@@ -38,7 +41,7 @@ class TestTree extends Component {
                 onDrop={this.onDrop}
                 onSelect={this.handleSelect.bind(this)}
             >
-                {loop(state.treeData)}
+                {loop(this.treeData)}
             </Tree>
         );
     }
@@ -47,7 +50,7 @@ class TestTree extends Component {
         return new Promise((resolve) => {
             axios.get("/api/suite/" + treeNode.props.data.id + "/children")
                 .then(function (response) {
-                    state.addChildNodes(treeNode.props.data, response.data);
+                    treeNode.props.data.children = response.data;
                     resolve();
                 });
         })
@@ -56,9 +59,7 @@ class TestTree extends Component {
     handleSelect(selectedKeys, e) {
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
-            state.addPanel(testNode.name, e.node.props.eventKey);
+            event.emit("TabbedPanel.addPanel", testNode.name, e.node.props.eventKey);
         }
     }
 }
-
-export default TestTree;

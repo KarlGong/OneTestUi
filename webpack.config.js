@@ -24,7 +24,10 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin()
     ],
     resolve: {
-        extensions: [".js", ".jsx"]
+        extensions: [".js", ".jsx"],
+        alias: {
+            event: path.join(__dirname, "src/utils/Event.js")
+        }
     },
     module: {
         rules: [

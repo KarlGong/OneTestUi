@@ -1,9 +1,7 @@
 import React, {Component} from "react";
-import {observer} from "mobx-react";
 import {observable} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
 import TestTree from "./TestTree";
-import {Tabs, Button} from "antd";
 import TabbedPanel from "./TabbedPanel";
 
 class TestSpecPage extends Component {

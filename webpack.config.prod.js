@@ -25,7 +25,10 @@ module.exports = {
         })
     ],
     resolve: {
-        extensions: [".js", ".jsx"]
+        extensions: [".js", ".jsx"],
+        alias: {
+            event: path.join(_dirname, "src/utils/Event.js")
+        }
     },
     module: {
         rules: [

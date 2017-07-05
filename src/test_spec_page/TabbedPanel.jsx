@@ -1,40 +1,66 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
-import {Layout, Menu, Icon, Tree} from "antd";
 import axios from "axios";
 import {Tabs, Button} from "antd";
-import state from "./State";
+import event from "event";
 import "./TabbedPanel.css";
 
 @observer
-class TabbedPanel extends Component {
+export default class TabbedPanel extends Component {
+    @observable panels = [];
+    @observable activePanelKey;
+
+    constructor() {
+        super();
+        event.on("TabbedPanel.addPanel", this.addPanel.bind(this));
+    }
 
     render() {
-        return (<div class="right-panel">{state.panels.length ?
+        return (<div class="right-panel">{this.panels.length ?
                 <Tabs
                     hideAdd
                     type="editable-card"
-                    activeKey={state.activePanelKey}
-                    onChange={this.onChange.bind(this)}
-                    onEdit={this.onEdit.bind(this)}
+                    activeKey={this.activePanelKey}
+                    onChange={this.selectPanel.bind(this)}
+                    onEdit={this.removePanel.bind(this)}
                 >
-                    {state.panels.map(panel =>
+                    {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.title} key={panel.key}>{panel.content}</Tabs.TabPane>)}
                 </Tabs> : <div class="info-text">Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
     }
 
-    onChange(key) {
-        state.selectPanel(key);
+    selectPanel(key) {
+        this.activePanelKey = key;
     }
 
-    onEdit(key, action) {
+    addPanel(title, key) {
+        this.activePanelKey = key;
+        let newPanel = {title, key};
+        for (let i = 0; i < this.panels.length; i++) {
+            if (this.panels[i].key === newPanel.key) return;
+        }
+        this.panels.push(newPanel);
+    }
+
+    removePanel(key, action) {
         if (action === "remove") {
-            state.removePanel(key);
+            if (this.activePanelKey === key) {
+                let lastIndex = -1;
+                this.panels.forEach((panel, i) => {
+                    if (panel.key === key) {
+                        lastIndex = i - 1;
+                    }
+                });
+                if (lastIndex >= 0) {
+                    this.activePanelKey = this.panels[lastIndex].key;
+                } else if (this.panels.length > 1) {
+                    this.activePanelKey = this.panels[1].key;
+                }
+            }
+            this.panels = this.panels.filter(panel => panel.key !== key);
         }
     }
 }
-
-export default TabbedPanel;
