@@ -8,16 +8,16 @@ module.exports = {
         "react-hot-loader/patch",
         "webpack-dev-server/client?http://localhost:3000",
         "webpack/hot/only-dev-server",
-        path.join(__dirname, "src/index")
+        path.join(__dirname, "app/index")
     ],
     output: {
-        path: path.join(__dirname, "dist"),
+        path: path.join(__dirname, "build"),
         filename: "main.js",
         // publicPath: "./"
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "src/index.tpl.html",
+            template: "app/index.tpl.html",
             inject: "body",
             filename: "index.html"
         }),
@@ -26,7 +26,7 @@ module.exports = {
     resolve: {
         extensions: [".js", ".jsx"],
         alias: {
-            event: path.join(__dirname, "src/utils/Event.js")
+            event: path.join(__dirname, "app/utils/Event.js")
         }
     },
     module: {
@@ -34,25 +34,38 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 use: ["babel-loader"],
-                exclude: /node_modules/,
-                include: path.join(__dirname, "src")
+                include: path.join(__dirname, "app")
             },
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"],
-                exclude: /node_modules/,
-                include: path.join(__dirname, "src")
+                include: path.join(__dirname, "app")
             },
             {
                 test: /\.less$/,
-                use: ["style-loader", "css-loader", "less-loader"],
-                include: [path.join(__dirname, "src"), path.join(__dirname, "node_modules", "antd")]
+                use: [
+                    "style-loader",
+                    "css-loader",
+                    {
+                        loader: "less-loader",
+                        query: {
+                            "sourceMap": true,
+                            "modifyVars": {
+                                "@icon-url": "'/app/assets/fonts/iconfont/iconfont'"
+                            }
+                        }
+                    }],
+                include: [path.join(__dirname, "app"), path.join(__dirname, "node_modules")]
             },
             {
-                test: /\.(jpe?g|png|gif|svg)$/,
-                use: ["file-loader"],
-                exclude: /node_modules/,
-                include: path.join(__dirname, "src")
+                test: /\.(jpe?g|png|gif|svg|eot|ttf|woff)$/,
+                use: [{
+                    loader: "file-loader",
+                    query: {
+                        name: "[path][name].[ext]",
+                    }
+                }],
+                include: path.join(__dirname, "app")
             }
         ]
     }

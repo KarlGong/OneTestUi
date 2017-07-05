@@ -4,7 +4,7 @@ import {Layout, Menu, Icon, Tree} from "antd";
 import TestTree from "./TestTree";
 import TabbedPanel from "./TabbedPanel";
 
-class TestSpecPage extends Component {
+class SpecPage extends Component {
 
     render() {
         return (
@@ -20,4 +20,4 @@ class TestSpecPage extends Component {
     }
 }
 
-export default TestSpecPage;
+export default SpecPage;

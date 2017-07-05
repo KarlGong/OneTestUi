@@ -4,12 +4,12 @@
   "description": "",
   "scripts": {
     "start": "node server.js",
-    "build": "rm -r -f build && mkdir build && set NODE_ENV=production && webpack -p --config webpack.config.prod.js --progress --colors",
+    "release": "rm -r -f build && mkdir build && set NODE_ENV=production && webpack -p --config webpack.config.prod.js --progress --colors",
     "lint": "eslint src"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KarlGong/OneTest.git"
+    "url": "https://github.com/KarlGong/OneTestUi.git"
   },
   "author": "Karl Gong <karl.gong@outlook.com> (http://github.com/KarlGong)",
   "license": "Apache",
@@ -18,7 +18,6 @@
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
     "babel-plugin-import": "^1.2.1",
-    "babel-plugin-react-html-attrs": "^2.0.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.5.0",

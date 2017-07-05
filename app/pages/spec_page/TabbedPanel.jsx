@@ -17,7 +17,7 @@ export default class TabbedPanel extends Component {
     }
 
     render() {
-        return (<div class="right-panel">{this.panels.length ?
+        return (<div className="right-panel">{this.panels.length ?
                 <Tabs
                     hideAdd
                     type="editable-card"
@@ -27,7 +27,7 @@ export default class TabbedPanel extends Component {
                 >
                     {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.title} key={panel.key}>{panel.content}</Tabs.TabPane>)}
-                </Tabs> : <div class="info-text">Select TestCase / TestSuite in left panel.</div>}
+                </Tabs> : <div className="info-text">Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
     }
