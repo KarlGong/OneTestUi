@@ -21,7 +21,7 @@ class TestCaseEditor extends Component {
     render() {
         return (
             <Spin spinning={this.loading}>
-                <div style={{height: "calc(100% - 155px)"}}>
+                <div style={{height: "calc(100% - 143px)"}}>
                         <div>
                             <Row>
                             <h3>Name</h3>

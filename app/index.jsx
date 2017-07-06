@@ -8,13 +8,13 @@ import SpecPage from "./pages/spec_page/Index";
 render(
     <AppContainer>
         <Layout>
-            <Layout.Header className="header">
+            <Layout.Header className="header" style={{height: "52px"}}>
                 <div className="logo"/>
                 <Menu
                     theme="dark"
                     mode="horizontal"
                     defaultSelectedKeys={["1"]}
-                    style={{lineHeight: "64px"}}
+                    style={{lineHeight: "52px"}}
                 >
                     <Menu.Item key="1">Test Spec</Menu.Item>
                     <Menu.Item key="2">Test Execution</Menu.Item>
