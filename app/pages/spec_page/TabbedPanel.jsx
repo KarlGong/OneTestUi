@@ -11,8 +11,7 @@ export default class TabbedPanel extends Component {
     @observable panels = [];
     @observable activePanelKey;
 
-    constructor() {
-        super();
+    componentDidMount() {
         event.on("TabbedPanel.addPanel", this.addPanel.bind(this));
     }
 

@@ -9,8 +9,9 @@ import event from "event";
 export default class TestTree extends Component {
     @observable treeData = [];
     @observable loading = false;
+    @observable selectedKeys = [];
 
-    componentWillMount() {
+    componentDidMount() {
         this.loading = true;
         axios.get("/api/project/1/rootsuite").then((response) => {
             this.loading = false;
@@ -21,14 +22,10 @@ export default class TestTree extends Component {
     render() {
         const loop = (data) => data.map((item) => {
             let key = item.type + "-" + item.id;
-            if (item.children && item.children.length) { // expanded test suite
-                return <Tree.TreeNode data={item} key={key}
-                                      title={item.name + " (" + item.count + ")"}>{loop(item.children)}</Tree.TreeNode>;
-            }
             if (item.type === "case") { // test case
                 return <Tree.TreeNode data={item} key={key} title={item.name} isLeaf/>;
-            } else { // collapsed test suite
-                return <Tree.TreeNode data={item} key={key} title={item.name + " (" + item.count + ")"}/>;
+            } else { // test suite
+                return <Tree.TreeNode data={item} key={key} title={item.name + " (" + item.count + ")"}>{loop(item.children)}</Tree.TreeNode>;
             }
         });
 
@@ -40,6 +37,7 @@ export default class TestTree extends Component {
                         draggable
                         showLine
                         showicon
+                        selectedKeys={this.selectedKeys}
                         loadData={this.loadChildren.bind(this)}
                         onDragEnter={this.onDragEnter}
                         onDrop={this.onDrop}
@@ -54,15 +52,20 @@ export default class TestTree extends Component {
 
     loadChildren(treeNode) {
         return new Promise((resolve) => {
-            axios.get("/api/suite/" + treeNode.props.data.id + "/children")
-                .then(function (response) {
-                    treeNode.props.data.children = response.data;
-                    resolve();
-                });
+            if (!treeNode.props.data.children.length) {
+                axios.get("/api/suite/" + treeNode.props.data.id + "/children")
+                    .then(function (response) {
+                        treeNode.props.data.children = response.data;
+                        resolve();
+                    });
+            } else {
+                resolve();
+            }
         })
     }
 
     handleSelect(selectedKeys, e) {
+        this.selectedKeys = [e.node.props.eventKey];
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
             event.emit("TabbedPanel.addPanel",
