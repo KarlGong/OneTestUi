@@ -3,8 +3,8 @@ import {observer} from "mobx-react";
 import {observable} from "mobx";
 import axios from "axios";
 import {Tabs, Button} from "antd";
-import event from "event";
-import TestCaseEditor from "./TestCaseEditor";
+import event from "shared/Event";
+
 
 @observer
 export default class TabbedPanel extends Component {
@@ -25,7 +25,7 @@ export default class TabbedPanel extends Component {
                     onEdit={this.removePanel.bind(this)}
                 >
                     {this.panels.map(panel =>
-                        <Tabs.TabPane tab={panel.name} key={panel.key}><TestCaseEditor testCaseId={panel.data.id}/></Tabs.TabPane>)}
+                        <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.view}</Tabs.TabPane>)}
                 </Tabs> : <div style={{fontSize: "20px", marginTop: "50px", textAlign: "center"}}>Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
