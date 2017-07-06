@@ -22,6 +22,9 @@ render(
                 </Menu>
             </Layout.Header>
             <SpecPage/>
+            <Layout.Footer style={{ textAlign: "center", padding:"12px 0" }}>
+                One Test ©2017 Created by Karl Gong | <a href="mailto:karl.gong%40outlook.com">Contact Me</a>
+            </Layout.Footer>
         </Layout>
     </AppContainer>,
     document.getElementById("app")

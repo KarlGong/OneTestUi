@@ -16,7 +16,7 @@ export default class TabbedPanel extends Component {
     }
 
     render() {
-        return (<div className="right-panel">{this.panels.length ?
+        return (<div>{this.panels.length ?
                 <Tabs
                     hideAdd
                     type="editable-card"

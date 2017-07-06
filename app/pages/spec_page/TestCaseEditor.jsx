@@ -7,10 +7,10 @@ import RichTextEditor from "shared/RichTextEditor";
 
 @observer
 class TestCaseEditor extends Component {
-    @observable testCase;
+    @observable testCase = {};
     @observable loading = false;
 
-    componentWillMount() {
+    componentDidMount() {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {
             this.loading = false;
@@ -21,8 +21,7 @@ class TestCaseEditor extends Component {
     render() {
         return (
             <Spin spinning={this.loading}>
-                <div style={{height: "calc(100% - 113px)"}}>
-                    {this.testCase ?
+                <div style={{height: "calc(100% - 155px)"}}>
                         <div>
                             <Row>
                             <h3>Name</h3>
@@ -30,8 +29,7 @@ class TestCaseEditor extends Component {
                             <Row>
                             <RichTextEditor value={this.testCase.name}/>
                             </Row>
-                        </div> : null
-                    }
+                        </div>
                 </div>
             </Spin>
         );
