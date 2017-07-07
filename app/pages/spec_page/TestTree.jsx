@@ -4,7 +4,7 @@ import {observable, action, toJS} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
 import event from "shared/Event";
-import {openContextMenu} from "shared/ContextMenu";
+import contextMenu from "shared/ContextMenu";
 import TestCaseEditor from "./TestCaseEditor";
 
 @observer
@@ -79,8 +79,9 @@ export default class TestTree extends Component {
     handleRightClick(e) {
         let testNode = e.node.props.data;
         switch (testNode.type) {
+            case "rootSuite":
             case "suite":
-                openContextMenu(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
+                contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
                         name: "View",
                         onClick: () => console.log("open")
@@ -105,7 +106,7 @@ export default class TestTree extends Component {
                 ]);
                 break;
             case "case":
-                openContextMenu(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
+                contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
                         name: "View",
                         onClick: () => this.viewCase(testNode)
@@ -135,7 +136,7 @@ export default class TestTree extends Component {
     viewCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
-                key: testCase.name + testCase.id,
+                key: testCase.type + "-" + testCase.id,
                 name: testCase.name,
                 view: <TestCaseEditor testCaseId={testCase.id}/>
             }

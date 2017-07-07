@@ -7,21 +7,15 @@ import {Dropdown, Menu} from "antd";
 const target = document.createElement("div");
 document.body.appendChild(target);
 
-export function openContextMenu(x, y, items) {
+function open(x, y, items) {
     render(<ContextMenuComponent x={x} y={y} items={items}/>, target);
 }
 
-export function closeContextMenu() {
+function close() {
     unmountComponentAtNode(target);
 }
 
 class ContextMenuComponent extends Component {
-
-    clickOutside(e) {
-        if (!target.contains(e.target)) {
-            closeContextMenu();
-        }
-    }
 
     componentDidMount() {
         document.addEventListener("click", this.clickOutside.bind(this), true);
@@ -31,9 +25,15 @@ class ContextMenuComponent extends Component {
         document.removeEventListener("click", this.clickOutside.bind(this), true);
     }
 
+    clickOutside(e) {
+        if (!target.contains(e.target)) {
+            close();
+        }
+    }
+
     handleClick(e) {
         e.item.props.data.onClick();
-        setTimeout(closeContextMenu, 200);
+        setTimeout(close, 0); // use setTimeout to prevent the setState warning
     }
 
     render() {
@@ -46,3 +46,5 @@ class ContextMenuComponent extends Component {
         </Menu>
     }
 }
+
+export default {open, close}
