@@ -10,9 +10,14 @@ import event from "shared/Event";
 export default class TabbedPanel extends Component {
     @observable panels = [];
     @observable activePanelKey;
+    disposer;
 
     componentDidMount() {
-        event.on("TabbedPanel.addPanel", this.addPanel.bind(this));
+        this.disposer = event.on("TabbedPanel.addPanel", this.addPanel.bind(this));
+    }
+
+    componentWillUnMount() {
+        this.disposer();
     }
 
     render() {

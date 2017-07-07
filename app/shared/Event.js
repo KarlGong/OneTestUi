@@ -4,17 +4,19 @@ class Event {
     emit(eventName, ...args) {
         if (this.listeners[eventName]) {
             this.listeners[eventName].map((func) => {
-               func(...args)
+                func(...args);
             });
         }
     }
 
     on(eventName, func) {
-        if (this.listeners[eventName]){
+        if (this.listeners[eventName]) {
             this.listeners[eventName].push(func);
         } else {
-            this.listeners[eventName] = [func]
+            this.listeners[eventName] = [func];
         }
+        // disposer
+        return () => this.listeners[eventName] = this.listeners[eventName].filter((item) => item !== func);
     }
 }
 
