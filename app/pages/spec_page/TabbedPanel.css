@@ -1,0 +1,21 @@
+.tabbed-panel {
+    margin: 1px 5px 0 5px;
+}
+
+.tabbed-panel .ant-tabs-bar {
+    margin-bottom: 0;
+}
+
+/*each tab panel*/
+.tabbed-panel .ant-tabs-tabpane {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100% - 33px);
+    padding: 0 5px;
+}
+
+.tabbed-panel .info {
+    font-size: 20px;
+    margin-top: 50px;
+    text-align: center
+}

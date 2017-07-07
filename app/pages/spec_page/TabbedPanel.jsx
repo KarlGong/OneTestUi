@@ -4,6 +4,7 @@ import {observable} from "mobx";
 import axios from "axios";
 import {Tabs, Button} from "antd";
 import event from "shared/Event";
+import "./TabbedPanel.css";
 
 
 @observer
@@ -21,7 +22,7 @@ export default class TabbedPanel extends Component {
     }
 
     render() {
-        return (<div>{this.panels.length ?
+        return (<div className="tabbed-panel">{this.panels.length ?
                 <Tabs
                     hideAdd
                     type="editable-card"
@@ -31,7 +32,7 @@ export default class TabbedPanel extends Component {
                 >
                     {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.view}</Tabs.TabPane>)}
-                </Tabs> : <div style={{fontSize: "20px", marginTop: "50px", textAlign: "center"}}>Select TestCase / TestSuite in left panel.</div>}
+                </Tabs> : <div className="info">Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
     }

@@ -5,7 +5,7 @@ import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
 import event from "shared/Event";
 import contextMenu from "shared/ContextMenu";
-import TestCaseEditor from "./TestCaseEditor";
+import TestCaseEditorPanel from "./TestCaseEditorPanel";
 
 @observer
 export default class TestTree extends Component {
@@ -138,7 +138,7 @@ export default class TestTree extends Component {
             {
                 key: testCase.type + "-" + testCase.id,
                 name: testCase.name,
-                view: <TestCaseEditor testCaseId={testCase.id}/>
+                view: <TestCaseEditorPanel testCaseId={testCase.id}/>
             }
         );
     }
