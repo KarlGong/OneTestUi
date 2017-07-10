@@ -8,7 +8,7 @@ class SpecPage extends Component {
 
     render() {
         return (
-            <Layout style={{height: "calc(100% - 94px)"}}>
+            <Layout>
                 <Layout.Sider width={200} style={{background: "#fff", borderRight: "1px #c0bdbd solid"}}>
                     <TestTree/>
                 </Layout.Sider>

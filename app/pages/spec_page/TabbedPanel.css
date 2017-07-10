@@ -8,8 +8,7 @@
 
 /*each tab panel*/
 .tabbed-panel .ant-tabs-tabpane {
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
     height: calc(100% - 33px);
     padding: 0 5px;
 }

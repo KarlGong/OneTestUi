@@ -21,8 +21,10 @@ render(
                     <Menu.Item key="3">Test Reports</Menu.Item>
                 </Menu>
             </Layout.Header>
-            <SpecPage/>
-            <Layout.Footer style={{ textAlign: "center", padding:"12px 0" }}>
+            <Layout style={{height: "calc(100% - 94px)"}}>
+                <SpecPage/>
+            </Layout>
+            <Layout.Footer style={{textAlign: "center", padding: "12px 0"}}>
                 One Test ©2017 Created by Karl Gong | <a href="mailto:karl.gong%40outlook.com">Contact Me</a>
             </Layout.Footer>
         </Layout>
