@@ -1,0 +1,39 @@
+
+@font-face {font-family: "anticon";
+  src: url('iconfont.eot?t=1499765266222'); /* IE9*/
+  src: url('iconfont.eot?t=1499765266222#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1499765266222') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1499765266222') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1499765266222#anticon') format('svg'); /* iOS 4.1- */
+}
+
+.anticon {
+  font-family:"anticon" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.anticon-editor-code:before { content: "\ea77"; }
+
+.anticon-editor-b:before { content: "\ea05"; }
+
+.anticon-editor-i:before { content: "\ea04"; }
+
+.anticon-editor-ul:before { content: "\ea03"; }
+
+.anticon-editor-ol:before { content: "\ea02"; }
+
+.anticon-editor-quote:before { content: "\ea01"; }
+
+.anticon-editor-h1:before { content: "\ea07"; }
+
+.anticon-editor-h2:before { content: "\ea08"; }
+
+.anticon-editor-h4:before { content: "\ea10"; }
+
+.anticon-editor-h3:before { content: "\ea11"; }
+
+.anticon-editor-underline:before { content: "\ea00"; }
+

@@ -51,7 +51,7 @@ module.exports = {
                         query: {
                             "sourceMap": true,
                             "modifyVars": {
-                                "@icon-url": "'/app/assets/fonts/iconfont/iconfont'"
+                                "@icon-url": "'/app/assets/fonts/antd-iconfont/iconfont'"
                             }
                         }
                     }],

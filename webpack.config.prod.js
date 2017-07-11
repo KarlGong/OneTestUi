@@ -51,7 +51,7 @@ module.exports = {
                         loader: "less-loader",
                         query: {
                             "modifyVars": {
-                                "@icon-url": "'/app/assets/fonts/iconfont/iconfont'"
+                                "@icon-url": "'/app/assets/fonts/antd-iconfont/iconfont'"
                             }
                         }
                     }],
