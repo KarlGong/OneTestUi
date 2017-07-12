@@ -2,8 +2,9 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import cs from "classnames";
-import {Editor, Raw, Mark } from "slate";
+import {Editor, Raw, Mark, Plain} from "slate";
 import {Icon} from "antd";
+import SlateTable from "slate-edit-table";
 import "./RichTextEditor.css";
 
 /**
@@ -11,6 +12,7 @@ import "./RichTextEditor.css";
  */
 
 const DEFAULT_NODE = "paragraph";
+const slateTable = SlateTable();
 
 /**
  * Define a schema.
@@ -21,14 +23,19 @@ const DEFAULT_NODE = "paragraph";
 const schema = {
     nodes: {
         "code": props => <pre {...props.attributes}><code>{props.children}</code></pre>,
-        "heading-one": props => <h1 {...props.attributes}>{props.children}</h1>,
-        "heading-two": props => <h2 {...props.attributes}>{props.children}</h2>,
-        "heading-three": props => <h3 {...props.attributes}>{props.children}</h3>,
-        "heading-four": props => <h4 {...props.attributes}>{props.children}</h4>,
         "block-quote": props => <blockquote {...props.attributes}>{props.children}</blockquote>,
         "numbered-list": props => <ol {...props.attributes}>{props.children}</ol>,
         "bulleted-list": props => <ul {...props.attributes}>{props.children}</ul>,
         "list-item": props => <li {...props.attributes}>{props.children}</li>,
+        "table": props =>
+            <table>
+                <tbody {...props.attributes}>{props.children}</tbody>
+            </table>,
+        "table_row": props => <tr {...props.attributes}>{props.children}</tr>,
+        "table_cell": (props) => {
+            let align = props.node.get("data").get("align") || "left";
+            return <td style={{textAlign: align}} {...props.attributes}>{props.children}</td>;
+        },
     },
     marks: {
         bold: {
@@ -63,15 +70,7 @@ class RichTextEditor extends Component {
      */
 
     state = {
-        state: Raw.deserialize({
-            "nodes": [
-                {
-                    "kind": "block",
-                    "type": "paragraph",
-                    "nodes": []
-                }
-            ]
-        }, {terse: true})
+        state: Plain.deserialize("")
     };
 
     isFocus = false;
@@ -162,13 +161,10 @@ class RichTextEditor extends Component {
                 {this.renderMarkButton("italic", "editor-i")}
                 {this.renderMarkButton("underlined", "editor-underline")}
                 {this.renderBlockButton("code", "editor-code")}
-                {this.renderBlockButton("heading-one", "editor-h1")}
-                {this.renderBlockButton("heading-two", "editor-h2")}
-                {this.renderBlockButton("heading-three", "editor-h3")}
-                {this.renderBlockButton("heading-four", "editor-h4")}
                 {this.renderBlockButton("block-quote", "editor-quote")}
                 {this.renderBlockButton("numbered-list", "editor-ol")}
                 {this.renderBlockButton("bulleted-list", "editor-ul")}
+                {this.renderTableButtons()}
                 {this.renderColorButton("#ED5565")}
                 {this.renderColorButton("#F6BB42")}
                 {this.renderColorButton("#A0D468")}
@@ -266,7 +262,8 @@ class RichTextEditor extends Component {
         const onMouseDown = e => this.onClickColor(e, color);
 
         return (
-            <span className="toolbar-color-button" style={{backgroundColor: color, borderColor: color}} onMouseDown={onMouseDown}>
+            <span className="toolbar-color-button" style={{backgroundColor: color, borderColor: color}}
+                  onMouseDown={onMouseDown}>
             </span>
         )
     };
@@ -346,6 +343,78 @@ class RichTextEditor extends Component {
                 <Icon className="icon" type={icon}/>
             </span>
         )
+    };
+
+    onInsertTable = () => {
+        let {state} = this.state;
+        this.onChange(
+            slateTable.transforms.insertTable(state.transform()).apply()
+        );
+    };
+
+    onInsertColumn = () => {
+        let {state} = this.state;
+        this.onChange(
+            slateTable.transforms.insertColumn(state.transform()).apply()
+        );
+    };
+
+    onInsertRow = () => {
+        let {state} = this.state;
+        this.onChange(
+            slateTable.transforms.insertRow(state.transform()).apply()
+        );
+    };
+
+    onRemoveColumn = () => {
+        let {state} = this.state;
+
+        this.onChange(
+            slateTable.transforms.removeColumn(state.transform()).apply()
+        );
+    };
+
+    onRemoveRow = () => {
+        let {state} = this.state;
+        this.onChange(
+            slateTable.transforms.removeRow(state.transform()).apply()
+        );
+    };
+
+    onRemoveTable = () => {
+        let {state} = this.state;
+        this.onChange(
+            slateTable.transforms.removeTable(state.transform()).apply()
+        );
+    };
+
+    renderTableButtons = () => {
+        let {state} = this.state;
+        let isTable = slateTable.utils.isSelectionInTable(state);
+
+        if (!isTable) {
+            return <span className="toolbar-button" onMouseDown={this.onInsertTable}>
+                    <Icon className="icon" type="insert-table"/>
+                </span>
+        } else {
+            return <span>
+                <span className="toolbar-button" onMouseDown={this.onInsertRow}>
+                    <Icon className="icon" type="insert-row"/>
+                </span>
+                <span className="toolbar-button" onMouseDown={this.onInsertColumn}>
+                    <Icon className="icon" type="insert-column"/>
+                </span>
+                <span className="toolbar-button" onMouseDown={this.onRemoveRow}>
+                    <Icon className="icon" type="delete-row"/>
+                </span>
+                <span className="toolbar-button" onMouseDown={this.onRemoveColumn}>
+                    <Icon className="icon" type="delete-column"/>
+                </span>
+                <span className="toolbar-button" onMouseDown={this.onRemoveTable}>
+                    <Icon className="icon" type="delete-table"/>
+                </span>
+            </span>
+        }
     };
 
     /**

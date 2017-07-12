@@ -33,6 +33,7 @@
 }
 
 .rich-text-editor .toolbar-color-button {
+    top: 1px;
     height: 15px;
     width: 15px;
     color: #AAA;
@@ -82,4 +83,16 @@
 
 .rich-text-editor .editor li {
     margin: 0.4em 0;
+}
+
+.rich-text-editor .editor table {
+    font-size: 1em;
+    border: 1px solid #aaa;
+    border-collapse: collapse;
+}
+
+.rich-text-editor .editor td {
+    border: 1px solid #aaa;
+    min-width: 1em;
+    padding: 0.3em;
 }
