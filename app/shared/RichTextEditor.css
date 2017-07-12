@@ -19,14 +19,12 @@
 
 .rich-text-editor .toolbar-button {
     height: 20px;
-    width: 20px;
+    width: 16px;
     color: #AAA;
     cursor: pointer;
-    margin: 0 5px;
-    padding: 3px 5px;
+    margin-left: 5px;
+    padding: 3px 0;
     display: inline-block;
-    position: relative;
-    line-height: 10px;
     font-size: 16px;
 }
 
@@ -39,43 +37,13 @@
     width: 15px;
     color: #AAA;
     cursor: pointer;
-    margin: 0 5px;
+    margin-left: 8px;
     padding: 3px 3px;
     display: inline-block;
     position: relative;
     line-height: 10px;
     border-radius: 3px;
     border: 1px black solid;
-}
-
-.rich-text-editor .toolbar-color-button.red {
-    background-color: rgb(237, 85, 101);
-    border: 1px rgb(237, 85, 101) solid;
-}
-
-.rich-text-editor .toolbar-color-button.yellow {
-    background-color: rgb(255, 206, 84);
-    border: 1px rgb(255, 206, 84) solid;
-}
-
-.rich-text-editor .toolbar-color-button.green {
-    background-color: rgb(160, 212, 104);
-    border: 1px rgb(160, 212, 104) solid;
-}
-
-.rich-text-editor .toolbar-color-button.blue {
-    background-color: rgb(79, 193, 233);
-    border: 1px rgb(79, 193, 233) solid;
-}
-
-.rich-text-editor .toolbar-color-button.purple {
-    background-color: rgb(150, 122, 220);
-    border: 1px rgb(150, 122, 220) solid;
-}
-
-.rich-text-editor .toolbar-color-button.black {
-    background-color: rgba(0, 0, 0, 0.65);
-    border: 1px rgba(0, 0, 0, 0.65) solid;
 }
 
 .rich-text-editor .editor {

@@ -161,12 +161,6 @@ class RichTextEditor extends Component {
                 {this.renderMarkButton("bold", "editor-b")}
                 {this.renderMarkButton("italic", "editor-i")}
                 {this.renderMarkButton("underlined", "editor-underline")}
-                {this.renderColorButton("#ED5565")}
-                {this.renderColorButton("#F6BB42")}
-                {this.renderColorButton("#A0D468")}
-                {this.renderColorButton("#4FC1E9")}
-                {this.renderColorButton("#967ADC")}
-                {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
                 {this.renderBlockButton("code", "editor-code")}
                 {this.renderBlockButton("heading-one", "editor-h1")}
                 {this.renderBlockButton("heading-two", "editor-h2")}
@@ -175,6 +169,12 @@ class RichTextEditor extends Component {
                 {this.renderBlockButton("block-quote", "editor-quote")}
                 {this.renderBlockButton("numbered-list", "editor-ol")}
                 {this.renderBlockButton("bulleted-list", "editor-ul")}
+                {this.renderColorButton("#ED5565")}
+                {this.renderColorButton("#F6BB42")}
+                {this.renderColorButton("#A0D468")}
+                {this.renderColorButton("#4FC1E9")}
+                {this.renderColorButton("#967ADC")}
+                {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
             </div>
         )
     };
