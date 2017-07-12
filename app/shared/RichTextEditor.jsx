@@ -39,6 +39,24 @@ const schema = {
         },
         underlined: {
             textDecoration: "underline"
+        },
+        red: {
+            color: "rgb(237, 85, 101)"
+        },
+        yellow: {
+            color: "rgb(255, 206, 84)"
+        },
+        green: {
+            color: "rgb(160, 212, 104)"
+        },
+        blue: {
+            color: "rgb(79, 193, 233)"
+        },
+        purple: {
+            color: "rgb(150, 122, 220)"
+        },
+        black: {
+            color: "rgba(0, 0, 0, 0.65)"
         }
     }
 };
@@ -172,6 +190,23 @@ class RichTextEditor extends Component {
         this.setState({state})
     };
 
+    onClickColor = (e, type) => {
+        e.preventDefault();
+        let {state} = this.state;
+
+        state = state
+            .transform()
+            .removeMark("red")
+            .removeMark("yellow")
+            .removeMark("green")
+            .removeMark("blue")
+            .removeMark("purple")
+            .removeMark("black")
+            .apply();
+
+        this.setState({state})
+    };
+
     /**
      * When a block button is clicked, toggle the block type.
      *
@@ -257,6 +292,12 @@ class RichTextEditor extends Component {
                 {this.renderMarkButton("bold", "editor-b")}
                 {this.renderMarkButton("italic", "editor-i")}
                 {this.renderMarkButton("underlined", "editor-underline")}
+                {this.renderColorButton("red", "red")}
+                {this.renderColorButton("yellow", "yellow")}
+                {this.renderColorButton("green", "green")}
+                {this.renderColorButton("blue", "blue")}
+                {this.renderColorButton("purple", "purple")}
+                {this.renderColorButton("black", "black")}
                 {this.renderBlockButton("code", "editor-code")}
                 {this.renderBlockButton("heading-one", "editor-h1")}
                 {this.renderBlockButton("heading-two", "editor-h2")}
@@ -282,8 +323,17 @@ class RichTextEditor extends Component {
         const onMouseDown = e => this.onClickMark(e, type);
 
         return (
-            <span className={"toolbar-button" + (isActive ? " active" : "")} onMouseDown={onMouseDown}>
+            <span className={cs("toolbar-button", {"active": isActive})} onMouseDown={onMouseDown}>
                 <Icon className="icon" type={icon}/>
+            </span>
+        )
+    };
+
+    renderColorButton = (type, color) => {
+        const onMouseDown = e => this.onClickColor(e, type);
+
+        return (
+            <span className={cs("toolbar-color-button", color)} onMouseDown={onMouseDown}>
             </span>
         )
     };
