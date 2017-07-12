@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import cs from "classnames";
-import {Editor, Raw} from "slate";
+import {Editor, Raw, Mark } from "slate";
 import {Icon} from "antd";
 import "./RichTextEditor.css";
 
@@ -40,24 +40,11 @@ const schema = {
         underlined: {
             textDecoration: "underline"
         },
-        red: {
-            color: "rgb(237, 85, 101)"
-        },
-        yellow: {
-            color: "rgb(255, 206, 84)"
-        },
-        green: {
-            color: "rgb(160, 212, 104)"
-        },
-        blue: {
-            color: "rgb(79, 193, 233)"
-        },
-        purple: {
-            color: "rgb(150, 122, 220)"
-        },
-        black: {
-            color: "rgba(0, 0, 0, 0.65)"
-        }
+        color: ({mark, children}) => (
+            <span style={{color: mark.data}}>
+                {children}
+            </span>
+        )
     }
 };
 
@@ -88,30 +75,6 @@ class RichTextEditor extends Component {
     };
 
     isFocus = false;
-
-    /**
-     * Check if the current selection has a mark with `type` in it.
-     *
-     * @param {String} type
-     * @return {Boolean}
-     */
-
-    hasMark = (type) => {
-        const {state} = this.state;
-        return state.marks.some(mark => mark.type === type);
-    };
-
-    /**
-     * Check if the any of the currently selected blocks are of `type`.
-     *
-     * @param {String} type
-     * @return {Boolean}
-     */
-
-    hasBlock = (type) => {
-        const {state} = this.state;
-        return state.blocks.some(node => node.type === type);
-    };
 
     /**
      * On change, save the new state.
@@ -172,6 +135,75 @@ class RichTextEditor extends Component {
     };
 
     /**
+     * Render.
+     *
+     * @return {Element}
+     */
+
+    render = () => {
+        return (
+            <div className={cs("rich-text-editor", {"active": this.isFocus})}>
+                {this.renderToolbar()}
+                {this.renderEditor()}
+            </div>
+        )
+    };
+
+    /**
+     * Render the toolbar.
+     *
+     * @return {Element}
+     */
+
+    renderToolbar = () => {
+        return (
+            <div className="toolbar">
+                {this.renderMarkButton("bold", "editor-b")}
+                {this.renderMarkButton("italic", "editor-i")}
+                {this.renderMarkButton("underlined", "editor-underline")}
+                {this.renderColorButton("#ED5565")}
+                {this.renderColorButton("#F6BB42")}
+                {this.renderColorButton("#A0D468")}
+                {this.renderColorButton("#4FC1E9")}
+                {this.renderColorButton("#967ADC")}
+                {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
+                {this.renderBlockButton("code", "editor-code")}
+                {this.renderBlockButton("heading-one", "editor-h1")}
+                {this.renderBlockButton("heading-two", "editor-h2")}
+                {this.renderBlockButton("heading-three", "editor-h3")}
+                {this.renderBlockButton("heading-four", "editor-h4")}
+                {this.renderBlockButton("block-quote", "editor-quote")}
+                {this.renderBlockButton("numbered-list", "editor-ol")}
+                {this.renderBlockButton("bulleted-list", "editor-ul")}
+            </div>
+        )
+    };
+
+    /**
+     * Check if the current selection has a mark with `type` in it.
+     *
+     * @param {String} type
+     * @return {Boolean}
+     */
+
+    hasMark = (type) => {
+        const {state} = this.state;
+        return state.marks.some(mark => mark.type === type);
+    };
+
+    /**
+     * Check if the any of the currently selected blocks are of `type`.
+     *
+     * @param {String} type
+     * @return {Boolean}
+     */
+
+    hasBlock = (type) => {
+        const {state} = this.state;
+        return state.blocks.some(node => node.type === type);
+    };
+
+    /**
      * When a mark button is clicked, toggle the current mark.
      *
      * @param {Event} e
@@ -190,21 +222,53 @@ class RichTextEditor extends Component {
         this.setState({state})
     };
 
-    onClickColor = (e, type) => {
+    /**
+     * Render a mark-toggling toolbar button.
+     *
+     * @param {String} type
+     * @param {String} icon
+     * @return {Element}
+     */
+
+    renderMarkButton = (type, icon) => {
+        const isActive = this.hasMark(type);
+        const onMouseDown = e => this.onClickMark(e, type);
+
+        return (
+            <span className={cs("toolbar-button", {"active": isActive})} onMouseDown={onMouseDown}>
+                <Icon className="icon" type={icon}/>
+            </span>
+        )
+    };
+
+    onClickColor = (e, color) => {
         e.preventDefault();
         let {state} = this.state;
+        let transform = state.transform();
 
-        state = state
-            .transform()
-            .removeMark("red")
-            .removeMark("yellow")
-            .removeMark("green")
-            .removeMark("blue")
-            .removeMark("purple")
-            .removeMark("black")
+        state.marks.map((mark) => {
+            if (mark.type === "color") {
+                transform = transform.removeMark(mark);
+            }
+        });
+
+        state = transform
+            .addMark(new Mark({
+                type: "color",
+                data: color
+            }))
             .apply();
 
         this.setState({state})
+    };
+
+    renderColorButton = (color) => {
+        const onMouseDown = e => this.onClickColor(e, color);
+
+        return (
+            <span className="toolbar-color-button" style={{backgroundColor: color, borderColor: color}} onMouseDown={onMouseDown}>
+            </span>
+        )
     };
 
     /**
@@ -266,79 +330,6 @@ class RichTextEditor extends Component {
     };
 
     /**
-     * Render.
-     *
-     * @return {Element}
-     */
-
-    render = () => {
-        return (
-            <div className={cs("rich-text-editor", {"active" : this.isFocus})}>
-                {this.renderToolbar()}
-                {this.renderEditor()}
-            </div>
-        )
-    };
-
-    /**
-     * Render the toolbar.
-     *
-     * @return {Element}
-     */
-
-    renderToolbar = () => {
-        return (
-            <div className="toolbar">
-                {this.renderMarkButton("bold", "editor-b")}
-                {this.renderMarkButton("italic", "editor-i")}
-                {this.renderMarkButton("underlined", "editor-underline")}
-                {this.renderColorButton("red", "red")}
-                {this.renderColorButton("yellow", "yellow")}
-                {this.renderColorButton("green", "green")}
-                {this.renderColorButton("blue", "blue")}
-                {this.renderColorButton("purple", "purple")}
-                {this.renderColorButton("black", "black")}
-                {this.renderBlockButton("code", "editor-code")}
-                {this.renderBlockButton("heading-one", "editor-h1")}
-                {this.renderBlockButton("heading-two", "editor-h2")}
-                {this.renderBlockButton("heading-three", "editor-h3")}
-                {this.renderBlockButton("heading-four", "editor-h4")}
-                {this.renderBlockButton("block-quote", "editor-quote")}
-                {this.renderBlockButton("numbered-list", "editor-ol")}
-                {this.renderBlockButton("bulleted-list", "editor-ul")}
-            </div>
-        )
-    };
-
-    /**
-     * Render a mark-toggling toolbar button.
-     *
-     * @param {String} type
-     * @param {String} icon
-     * @return {Element}
-     */
-
-    renderMarkButton = (type, icon) => {
-        const isActive = this.hasMark(type);
-        const onMouseDown = e => this.onClickMark(e, type);
-
-        return (
-            <span className={cs("toolbar-button", {"active": isActive})} onMouseDown={onMouseDown}>
-                <Icon className="icon" type={icon}/>
-            </span>
-        )
-    };
-
-    renderColorButton = (type, color) => {
-        const onMouseDown = e => this.onClickColor(e, type);
-
-        return (
-            <span className={cs("toolbar-color-button", color)} onMouseDown={onMouseDown}>
-            </span>
-        )
-    };
-
-    /**
      * Render a block-toggling toolbar button.
      *
      * @param {String} type
@@ -372,8 +363,12 @@ class RichTextEditor extends Component {
                     state={this.state.state}
                     onChange={this.onChange}
                     onKeyDown={this.onKeyDown}
-                    onFocus={() => {this.isFocus = true}}
-                    onBlur={() => {this.isFocus = false}}
+                    onFocus={() => {
+                        this.isFocus = true
+                    }}
+                    onBlur={() => {
+                        this.isFocus = false
+                    }}
                 />
             </div>
         )

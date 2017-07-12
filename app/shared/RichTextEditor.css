@@ -45,6 +45,7 @@
     position: relative;
     line-height: 10px;
     border-radius: 3px;
+    border: 1px black solid;
 }
 
 .rich-text-editor .toolbar-color-button.red {
