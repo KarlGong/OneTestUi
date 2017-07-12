@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
-
+import cs from "classnames";
 import {Editor, Raw} from "slate";
 import {Icon} from "antd";
 import "./RichTextEditor.css";
@@ -20,24 +20,19 @@ const DEFAULT_NODE = "paragraph";
 
 const schema = {
     nodes: {
-        "block-quote": props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-        "bulleted-list": props => <ul {...props.attributes}>{props.children}</ul>,
+        "code": props => <pre {...props.attributes}><code>{props.children}</code></pre>,
         "heading-one": props => <h1 {...props.attributes}>{props.children}</h1>,
         "heading-two": props => <h2 {...props.attributes}>{props.children}</h2>,
         "heading-three": props => <h3 {...props.attributes}>{props.children}</h3>,
         "heading-four": props => <h4 {...props.attributes}>{props.children}</h4>,
-        "list-item": props => <li {...props.attributes}>{props.children}</li>,
+        "block-quote": props => <blockquote {...props.attributes}>{props.children}</blockquote>,
         "numbered-list": props => <ol {...props.attributes}>{props.children}</ol>,
+        "bulleted-list": props => <ul {...props.attributes}>{props.children}</ul>,
+        "list-item": props => <li {...props.attributes}>{props.children}</li>,
     },
     marks: {
         bold: {
             fontWeight: "bold"
-        },
-        code: {
-            fontFamily: "monospace",
-            backgroundColor: "#eee",
-            padding: "3px",
-            borderRadius: "4px"
         },
         italic: {
             fontStyle: "italic"
@@ -54,7 +49,7 @@ const schema = {
  * @type {Component}
  */
 
-class RichTextEditor extends React.Component {
+class RichTextEditor extends Component {
 
     /**
      * Deserialize the initial editor state.
@@ -73,6 +68,8 @@ class RichTextEditor extends React.Component {
             ]
         }, {terse: true})
     };
+
+    isFocus = false;
 
     /**
      * Check if the current selection has a mark with `type` in it.
@@ -118,33 +115,42 @@ class RichTextEditor extends React.Component {
      */
 
     onKeyDown = (e, data, state) => {
-        if (!data.isMod) return;
-        let mark;
+        if (data.key === "enter" && e.shiftKey) { // shift enter
+            state = state
+                .transform()
+                .insertText("\n")
+                .apply();
 
-        switch (data.key) {
-            case "b":
-                mark = "bold";
-                break;
-            case "i":
-                mark = "italic";
-                break;
-            case "u":
-                mark = "underlined";
-                break;
-            case "`":
-                mark = "code";
-                break;
-            default:
-                return;
+            e.preventDefault();
+            return state;
+        } else if (data.isMod) { // shortcut
+            let mark;
+
+            switch (data.key) {
+                case "b":
+                    mark = "bold";
+                    break;
+                case "i":
+                    mark = "italic";
+                    break;
+                case "u":
+                    mark = "underlined";
+                    break;
+                case "`":
+                    mark = "code";
+                    break;
+                default:
+                    return;
+            }
+
+            state = state
+                .transform()
+                .toggleMark(mark)
+                .apply();
+
+            e.preventDefault();
+            return state
         }
-
-        state = state
-            .transform()
-            .toggleMark(mark)
-            .apply();
-
-        e.preventDefault();
-        return state
     };
 
     /**
@@ -232,7 +238,7 @@ class RichTextEditor extends React.Component {
 
     render = () => {
         return (
-            <div className={"rich-text-editor" + (this.isFocus ? " active": "")}>
+            <div className={cs("rich-text-editor", {"active" : this.isFocus})}>
                 {this.renderToolbar()}
                 {this.renderEditor()}
             </div>
@@ -251,7 +257,7 @@ class RichTextEditor extends React.Component {
                 {this.renderMarkButton("bold", "editor-b")}
                 {this.renderMarkButton("italic", "editor-i")}
                 {this.renderMarkButton("underlined", "editor-underline")}
-                {this.renderMarkButton("code", "editor-code")}
+                {this.renderBlockButton("code", "editor-code")}
                 {this.renderBlockButton("heading-one", "editor-h1")}
                 {this.renderBlockButton("heading-two", "editor-h2")}
                 {this.renderBlockButton("heading-three", "editor-h3")}
@@ -295,7 +301,7 @@ class RichTextEditor extends React.Component {
         const onMouseDown = e => this.onClickBlock(e, type);
 
         return (
-            <span className={"toolbar-button" + (isActive ? " active" : "")} onMouseDown={onMouseDown}>
+            <span className={cs("toolbar-button", {"active": isActive})} onMouseDown={onMouseDown}>
                 <Icon className="icon" type={icon}/>
             </span>
         )
