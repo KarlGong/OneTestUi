@@ -64,7 +64,7 @@ const schema = {
  *
  * @type {Component}
  */
-
+@observer
 class RichTextEditor extends Component {
 
     /**
@@ -77,7 +77,8 @@ class RichTextEditor extends Component {
         state: Plain.deserialize("")
     };
 
-    isFocus = false;
+    @observable isFocus = false;
+    @observable isToolbarShow = false;
 
     /**
      * On change, save the new state.
@@ -146,10 +147,17 @@ class RichTextEditor extends Component {
     render = () => {
         return (
             <div className={cs("rich-text-editor", {"active": this.isFocus})}>
+                {this.renderToggleButton()}
                 {this.renderToolbar()}
                 {this.renderEditor()}
             </div>
         )
+    };
+
+    renderToggleButton = () => {
+        return this.isToolbarShow ?
+            <div className="toggle-button" onClick={() => this.isToolbarShow = false}><Icon type="up" /></div>
+            : <div  className="toggle-button" onClick={() => this.isToolbarShow = true}><Icon type="ellipsis" /></div>
     };
 
     /**
@@ -159,7 +167,7 @@ class RichTextEditor extends Component {
      */
 
     renderToolbar = () => {
-        return (
+        return ( this.isToolbarShow ?
             <div className="toolbar">
                 {this.renderMarkButton("bold", "editor-b")}
                 {this.renderMarkButton("italic", "editor-i")}
@@ -175,7 +183,7 @@ class RichTextEditor extends Component {
                 {this.renderColorButton("#4FC1E9")}
                 {this.renderColorButton("#967ADC")}
                 {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
-            </div>
+            </div> : null
         )
     };
 
