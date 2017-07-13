@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import cs from "classnames";
-import {Editor, Raw, Mark, Plain} from "slate";
+import {Editor, Raw, Mark, Plain, Block} from "slate";
 import {Icon} from "antd";
 import SlateTable from "slate-edit-table";
 import "./RichTextEditor.css";
@@ -12,7 +12,11 @@ import "./RichTextEditor.css";
  */
 
 const DEFAULT_NODE = "paragraph";
-const slateTable = SlateTable();
+const slateTable = SlateTable({
+    typeTable: "table",
+    typeRow: "table-row",
+    typeCell: "table-cell"
+});
 
 /**
  * Define a schema.
@@ -31,8 +35,8 @@ const schema = {
             <table>
                 <tbody {...props.attributes}>{props.children}</tbody>
             </table>,
-        "table_row": props => <tr {...props.attributes}>{props.children}</tr>,
-        "table_cell": (props) => {
+        "table-row": props => <tr {...props.attributes}>{props.children}</tr>,
+        "table-cell": (props) => {
             let align = props.node.get("data").get("align") || "left";
             return <td style={{textAlign: align}} {...props.attributes}>{props.children}</td>;
         },
@@ -383,9 +387,11 @@ class RichTextEditor extends Component {
 
     onRemoveTable = () => {
         let {state} = this.state;
-        this.onChange(
-            slateTable.transforms.removeTable(state.transform()).apply()
-        );
+        let newState = slateTable.transforms.removeTable(state.transform()).apply();
+        if (newState.document.isEmpty) {
+            newState = Plain.deserialize("");
+        }
+        this.onChange(newState);
     };
 
     renderTableButtons = () => {
