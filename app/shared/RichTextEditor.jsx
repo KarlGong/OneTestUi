@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import cs from "classnames";
-import {Editor, Raw, Mark, Plain, Block} from "slate";
+import {Editor, Raw, Mark, Plain, Block, Html} from "slate";
 import {Icon} from "antd";
 import SlateTable from "slate-edit-table";
 import "./RichTextEditor.css";
@@ -67,18 +67,18 @@ const schema = {
 @observer
 class RichTextEditor extends Component {
 
-    /**
-     * Deserialize the initial editor state.
-     *
-     * @type {Object}
-     */
-
     state = {
         state: Plain.deserialize("")
     };
 
     @observable isFocus = false;
     @observable isToolbarShow = false;
+
+    componentDidMount() {
+        this.setState({
+            state: Plain.deserialize(this.props.defaultValue)
+        })
+    }
 
     /**
      * On change, save the new state.
@@ -146,7 +146,8 @@ class RichTextEditor extends Component {
 
     render = () => {
         return (
-            <div className={cs("rich-text-editor", {"active": this.isFocus})}>
+            <div className={cs("rich-text-editor", {"active": this.isFocus}, this.props.className)}
+                style={this.props.style}>
                 {this.renderToggleButton()}
                 {this.renderToolbar()}
                 {this.renderEditor()}
@@ -396,7 +397,7 @@ class RichTextEditor extends Component {
     onRemoveTable = () => {
         let {state} = this.state;
         let newState = slateTable.transforms.removeTable(state.transform()).apply();
-        if (newState.document.isEmpty) {
+        if (!newState.document.nodes.size) {
             newState = Plain.deserialize("");
         }
         this.onChange(newState);

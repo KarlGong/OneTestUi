@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable} from "mobx";
-import {Spin, Row, Col, Form, Button, Icon} from "antd";
+import {observable, toJS} from "mobx";
+import {Spin, Row, Col, Form, Button, Icon, Input} from "antd";
 import axios from "axios";
 import RichTextEditor from "shared/RichTextEditor";
 import "./TestCaseEditorPanel.css";
@@ -14,8 +14,8 @@ class TestCaseEditorPanel extends Component {
     componentDidMount() {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {
-            this.loading = false;
             this.testCase = response.data;
+            this.loading = false;
         })
     }
 
@@ -25,19 +25,19 @@ class TestCaseEditorPanel extends Component {
                 <div className="test-case-editor">
                     <Form layout="vertical">
                         <Form.Item label="Name" validateStatus="error">
-                            <RichTextEditor style={{width: "45%"}} defaultValue={this.testCase.name}/>
+                            <Input size="default" style={{width: "45%"}} defaultValue={this.testCase.name}/>
                         </Form.Item>
                         <Form.Item label="Summary">
-                            <RichTextEditor multiLine defaultValue={this.testCase.summary}/>
+                            <RichTextEditor defaultValue={this.testCase.summary}/>
                         </Form.Item>
                         <Form.Item label="Precondition">
-                            <RichTextEditor multiLine defaultValue={this.testCase.precondition}/>
+                            <RichTextEditor defaultValue={this.testCase.precondition}/>
                         </Form.Item>
                         <Form.Item label="Test Steps">
                             {this.testCase.testSteps.map((item, i) =>
                                 <div key={i} className="test-step">
-                                    <RichTextEditor className="action" multiLine defaultValue={item.action}/>
-                                    <RichTextEditor className="expected-result" multiLine defaultValue={item.expectedResult}/>
+                                    <RichTextEditor className="action" defaultValue={item.action}/>
+                                    <RichTextEditor className="expected-result" defaultValue={item.expectedResult}/>
                                     <Icon
                                         className="delete button"
                                         type="close-circle-o"

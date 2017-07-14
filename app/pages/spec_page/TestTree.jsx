@@ -16,8 +16,8 @@ export default class TestTree extends Component {
     componentDidMount() {
         this.loading = true;
         axios.get("/api/project/1/rootsuite").then((response) => {
-            this.loading = false;
             this.treeData.push(response.data);
+            this.loading = false;
         })
     }
 
