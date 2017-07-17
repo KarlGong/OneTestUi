@@ -1,0 +1,4 @@
+input[readonly] {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}

@@ -242,7 +242,7 @@ class RichTextEditor extends Component {
 
     render = () => {
         return (
-            <div className={cs("rich-text-editor", {"active": this.isFocus}, this.props.className)}
+            <div className={cs("rich-text-editor", {"active": this.isFocus, "read-only": this.props.readOnly}, this.props.className)}
                  style={this.props.style}>
                 {this.renderToggleButton()}
                 {this.renderToolbar()}
@@ -251,11 +251,13 @@ class RichTextEditor extends Component {
         )
     };
 
-    renderToggleButton = () => (
-        <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
-            <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
-        </div>
-    );
+    renderToggleButton = () => {
+        return ( this.props.readOnly ? null :
+            <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
+                <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
+            </div>
+        )
+    };
 
     /**
      * Render the toolbar.

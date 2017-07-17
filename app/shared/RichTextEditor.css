@@ -4,6 +4,10 @@
     position: relative;
 }
 
+.rich-text-editor.read-only {
+    border-color: transparent !important;
+}
+
 .rich-text-editor.active {
     border-color: #49a9ee;
     outline: 0;

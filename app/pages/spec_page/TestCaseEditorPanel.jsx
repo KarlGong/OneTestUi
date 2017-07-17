@@ -11,15 +11,15 @@ class TestCaseEditorPanel extends Component {
     @observable testCase = {testSteps: []};
     @observable loading = false;
 
-    componentDidMount() {
+    componentDidMount = () => {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {
             this.testCase = response.data;
             this.loading = false;
         })
-    }
+    };
 
-    render() {
+    render = () => {
         return (
             <Spin spinning={this.loading}>
                 <div className="test-case-editor">
@@ -51,7 +51,7 @@ class TestCaseEditorPanel extends Component {
                                 </div>
                             )}
                             <Form.Item>
-                                <Button type="dashed" onClick={this.addTestStep.bind(this)} style={{width: "100%"}}>
+                                <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
                                     <Icon type="plus"/> Add Test Step
                                 </Button>
                             </Form.Item>
@@ -60,14 +60,14 @@ class TestCaseEditorPanel extends Component {
                 </div>
             </Spin>
         );
-    }
+    };
 
-    addTestStep() {
+    addTestStep = (e) => {
         this.testCase.testSteps.push({
-            action: "",
-            expectedResult: ""
-        })
-    }
+            action: "<p></p>",
+            expectedResult: "<p></p>"
+        });
+    };
 
 }
 

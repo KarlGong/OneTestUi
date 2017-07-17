@@ -5,6 +5,7 @@ import {observable} from "mobx";
 import {Layout, Menu} from "antd";
 import SpecPage from "./pages/spec_page/Index";
 import "./assets/fonts/extra-iconfont/iconfont.css";
+import "./index.css";
 
 render(
     <AppContainer>
