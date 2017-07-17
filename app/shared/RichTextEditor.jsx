@@ -1,3 +1,4 @@
+import {Map} from "immutable";
 import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
@@ -36,28 +37,124 @@ const schema = {
                 <tbody {...props.attributes}>{props.children}</tbody>
             </table>,
         "table-row": props => <tr {...props.attributes}>{props.children}</tr>,
-        "table-cell": (props) => {
-            let align = props.node.get("data").get("align") || "left";
-            return <td style={{textAlign: align}} {...props.attributes}>{props.children}</td>;
-        },
+        "table-cell": (props) => <td {...props.attributes}>{props.children}</td>
     },
     marks: {
-        bold: {
-            fontWeight: "bold"
-        },
-        italic: {
-            fontStyle: "italic"
-        },
-        underlined: {
-            textDecoration: "underline"
-        },
-        color: ({mark, children}) => (
-            <span style={{color: mark.data}}>
-                {children}
-            </span>
-        )
+        bold: ({mark, children}) => <span style={{fontWeight: "bold"}}>{children}</span>,
+        italic: ({mark, children}) => <span style={{fontStyle: "italic"}}>{children}</span>,
+        underlined: ({mark, children}) => <span style={{textDecoration: "underline"}}>{children}</span>,
+        color: ({mark, children}) => <span style={{color: mark.data.color}}>{children}</span>
     }
 };
+
+const rules = [
+    {
+        deserialize(el, next) {
+            switch (el.tagName) {
+                case "p":
+                    return {
+                        kind: "block",
+                        type: "paragraph",
+                        nodes: next(el.children)
+                    };
+                case "pre":
+                    return {
+                        kind: "block",
+                        type: "code",
+                        nodes: next(el.children)
+                    };
+                case "blockquote":
+                    return {
+                        kind: "block",
+                        type: "block-quote",
+                        nodes: next(el.children)
+                    };
+                case "ol":
+                    return {
+                        kind: "block",
+                        type: "numbered-list",
+                        nodes: next(el.children)
+                    };
+                case "ul":
+                    return {
+                        kind: "block",
+                        type: "bulleted-list",
+                        nodes: next(el.children)
+                    };
+                case "li":
+                    return {
+                        kind: "block",
+                        type: "list-item",
+                        nodes: next(el.children)
+                    };
+                case "table":
+                    return {
+                        kind: "block",
+                        type: "table",
+                        nodes: next(el.children)
+                    };
+                case "tr":
+                    return {
+                        kind: "block",
+                        type: "table-row",
+                        nodes: next(el.children)
+                    };
+                case "td":
+                    return {
+                        kind: "block",
+                        type: "table-cell",
+                        nodes: next(el.children)
+                    };
+                case "span":
+                    return {
+                        kind: "mark",
+                        type: el.attribs.type,
+                        data: el.attribs,
+                        nodes: next(el.children)
+                    }
+            }
+        },
+        serialize(object, children) {
+            if (object.kind === "block") {
+                switch (object.type) {
+                    case "paragraph":
+                        return <p>{children}</p>;
+                    case "code":
+                        return <pre><code>{children}</code></pre>;
+                    case "block-quote":
+                        return <blockquote>{children}</blockquote>;
+                    case "numbered-list":
+                        return <ol>{children}</ol>;
+                    case "bulleted-list":
+                        return <ul>{children}</ul>;
+                    case "list-item":
+                        return <li>{children}</li>;
+                    case "table":
+                        return <table>
+                            <tbody>{children}</tbody>
+                        </table>;
+                    case "table-row":
+                        return <tr>{children}</tr>;
+                    case "table-cell":
+                        return <td>{children}</td>;
+                }
+            } else {
+                switch (object.type) {
+                    case "bold":
+                        return <span style={{fontWeight: "bold"}} type="bold">{children}</span>;
+                    case "italic":
+                        return <span style={{fontStyle: "italic"}} type="italic">{children}</span>;
+                    case "underlined":
+                        return <span style={{textDecoration: "underline"}} type="underlined">{children}</span>;
+                    case "color":
+                        return <span style={{color: object.data.color}} type="color" color={object.data.color}>{children}</span>;
+                }
+            }
+        }
+    }
+];
+
+const htmlSerializer = new Html({rules});
 
 /**
  * The rich text example.
@@ -67,18 +164,17 @@ const schema = {
 @observer
 class RichTextEditor extends Component {
 
-    state = {
-        state: Plain.deserialize("")
+    static defaultProps = {
+        defaultValue: "<p></p>",
+        readOnly: false
     };
 
     @observable isFocus = false;
     @observable isToolbarShow = false;
 
-    componentDidMount() {
-        this.setState({
-            state: Plain.deserialize(this.props.defaultValue)
-        })
-    }
+    state = {
+        state: htmlSerializer.deserialize(this.props.defaultValue)
+    };
 
     /**
      * On change, save the new state.
@@ -91,7 +187,7 @@ class RichTextEditor extends Component {
     };
 
     /**
-     * On key down, if it's a formatting command toggle a mark.
+     * On key down
      *
      * @param {Event} e
      * @param {Object} data
@@ -147,7 +243,7 @@ class RichTextEditor extends Component {
     render = () => {
         return (
             <div className={cs("rich-text-editor", {"active": this.isFocus}, this.props.className)}
-                style={this.props.style}>
+                 style={this.props.style}>
                 {this.renderToggleButton()}
                 {this.renderToolbar()}
                 {this.renderEditor()}
@@ -155,11 +251,11 @@ class RichTextEditor extends Component {
         )
     };
 
-    renderToggleButton = () => {
-        return this.isToolbarShow ?
-            <div className="toggle-button" onClick={() => this.isToolbarShow = false}><Icon type="up" /></div>
-            : <div  className="toggle-button" onClick={() => this.isToolbarShow = true}><Icon type="ellipsis" /></div>
-    };
+    renderToggleButton = () => (
+        <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
+            <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
+        </div>
+    );
 
     /**
      * Render the toolbar.
@@ -169,22 +265,22 @@ class RichTextEditor extends Component {
 
     renderToolbar = () => {
         return ( this.isToolbarShow ?
-            <div className="toolbar">
-                {this.renderMarkButton("bold", "editor-b")}
-                {this.renderMarkButton("italic", "editor-i")}
-                {this.renderMarkButton("underlined", "editor-underline")}
-                {this.renderBlockButton("code", "editor-code")}
-                {this.renderBlockButton("block-quote", "editor-quote")}
-                {this.renderBlockButton("numbered-list", "editor-ol")}
-                {this.renderBlockButton("bulleted-list", "editor-ul")}
-                {this.renderTableButtons()}
-                {this.renderColorButton("#ED5565")}
-                {this.renderColorButton("#F6BB42")}
-                {this.renderColorButton("#A0D468")}
-                {this.renderColorButton("#4FC1E9")}
-                {this.renderColorButton("#967ADC")}
-                {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
-            </div> : null
+                <div className="toolbar">
+                    {this.renderMarkButton("bold", "editor-b")}
+                    {this.renderMarkButton("italic", "editor-i")}
+                    {this.renderMarkButton("underlined", "editor-underline")}
+                    {this.renderBlockButton("code", "editor-code")}
+                    {this.renderBlockButton("block-quote", "editor-quote")}
+                    {this.renderBlockButton("numbered-list", "editor-ol")}
+                    {this.renderBlockButton("bulleted-list", "editor-ul")}
+                    {this.renderTableButtons()}
+                    {this.renderColorButton("#ED5565")}
+                    {this.renderColorButton("#F6BB42")}
+                    {this.renderColorButton("#A0D468")}
+                    {this.renderColorButton("#4FC1E9")}
+                    {this.renderColorButton("#967ADC")}
+                    {this.renderColorButton("rgba(0, 0, 0, 0.65)")}
+                </div> : null
         )
     };
 
@@ -264,7 +360,10 @@ class RichTextEditor extends Component {
         state = transform
             .addMark(new Mark({
                 type: "color",
-                data: color
+                data: {
+                    color: color,
+                    toJSON: () => color // fix mark.data is not a function issue
+                }
             }))
             .apply();
 
@@ -344,7 +443,6 @@ class RichTextEditor extends Component {
      *
      * @param {String} type
      * @param {String} icon
-     * @return {Element}
      */
 
     renderBlockButton = (type, icon) => {
@@ -408,27 +506,31 @@ class RichTextEditor extends Component {
         let isTable = slateTable.utils.isSelectionInTable(state);
 
         if (!isTable) {
-            return <span className="toolbar-button" onMouseDown={this.onInsertTable}>
+            return (
+                <span className="toolbar-button" onMouseDown={this.onInsertTable}>
                     <Icon className="icon" type="insert-table"/>
                 </span>
+            );
         } else {
-            return <span>
-                <span className="toolbar-button" onMouseDown={this.onInsertRow}>
-                    <Icon className="icon" type="insert-row"/>
+            return (
+                <span>
+                    <span className="toolbar-button" onMouseDown={this.onInsertRow}>
+                        <Icon className="icon" type="insert-row"/>
+                    </span>
+                    <span className="toolbar-button" onMouseDown={this.onInsertColumn}>
+                        <Icon className="icon" type="insert-column"/>
+                    </span>
+                    <span className="toolbar-button" onMouseDown={this.onRemoveRow}>
+                        <Icon className="icon" type="delete-row"/>
+                    </span>
+                    <span className="toolbar-button" onMouseDown={this.onRemoveColumn}>
+                        <Icon className="icon" type="delete-column"/>
+                    </span>
+                    <span className="toolbar-button" onMouseDown={this.onRemoveTable}>
+                        <Icon className="icon" type="delete-table"/>
+                    </span>
                 </span>
-                <span className="toolbar-button" onMouseDown={this.onInsertColumn}>
-                    <Icon className="icon" type="insert-column"/>
-                </span>
-                <span className="toolbar-button" onMouseDown={this.onRemoveRow}>
-                    <Icon className="icon" type="delete-row"/>
-                </span>
-                <span className="toolbar-button" onMouseDown={this.onRemoveColumn}>
-                    <Icon className="icon" type="delete-column"/>
-                </span>
-                <span className="toolbar-button" onMouseDown={this.onRemoveTable}>
-                    <Icon className="icon" type="delete-table"/>
-                </span>
-            </span>
+            );
         }
     };
 
@@ -443,6 +545,7 @@ class RichTextEditor extends Component {
             <div className="editor">
                 <Editor
                     spellCheck
+                    readOnly={this.props.readOnly}
                     schema={schema}
                     state={this.state.state}
                     onChange={this.onChange}

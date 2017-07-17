@@ -25,19 +25,19 @@ class TestCaseEditorPanel extends Component {
                 <div className="test-case-editor">
                     <Form layout="vertical">
                         <Form.Item label="Name" validateStatus="error">
-                            <Input size="default" style={{width: "45%"}} defaultValue={this.testCase.name}/>
+                            <Input key={this.loading} size="default" style={{width: "45%"}} defaultValue={this.testCase.name}/>
                         </Form.Item>
                         <Form.Item label="Summary">
-                            <RichTextEditor defaultValue={this.testCase.summary}/>
+                            <RichTextEditor key={this.loading} defaultValue={this.testCase.summary}/>
                         </Form.Item>
                         <Form.Item label="Precondition">
-                            <RichTextEditor defaultValue={this.testCase.precondition}/>
+                            <RichTextEditor key={this.loading} defaultValue={this.testCase.precondition}/>
                         </Form.Item>
                         <Form.Item label="Test Steps">
                             {this.testCase.testSteps.map((item, i) =>
                                 <div key={i} className="test-step">
-                                    <RichTextEditor className="action" defaultValue={item.action}/>
-                                    <RichTextEditor className="expected-result" defaultValue={item.expectedResult}/>
+                                    <RichTextEditor key={"action" + this.loading} className="action" defaultValue={item.action}/>
+                                    <RichTextEditor key={"result" + this.loading} className="expected-result" defaultValue={item.expectedResult}/>
                                     <Icon
                                         className="delete button"
                                         type="close-circle-o"
