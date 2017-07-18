@@ -36,25 +36,27 @@ class TestCaseEditorPanel extends Component {
                         <Form.Item label="Test Steps">
                             {this.testCase.testSteps.map((item, i) =>
                                 <div key={i} className="test-step">
+                                    <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
+                                        <Icon type="plus"/> Add Test Step
+                                    </Button>
+                                    
                                     <RichTextEditor key={"action" + this.loading} className="action" defaultValue={item.action}/>
                                     <RichTextEditor key={"result" + this.loading} className="expected-result" defaultValue={item.expectedResult}/>
+                                    <Icon
+                                        className="copy button"
+                                        type="copy"
+                                        onClick
+                                    />
                                     <Icon
                                         className="delete button"
                                         type="close-circle-o"
                                         onClick
                                     />
-                                    <Icon
-                                        className="insert button"
-                                        type="plus-circle-o"
-                                        onClick
-                                    />
                                 </div>
                             )}
-                            <Form.Item>
-                                <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
-                                    <Icon type="plus"/> Add Test Step
-                                </Button>
-                            </Form.Item>
+                            <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
+                                <Icon type="plus"/> Add Test Step
+                            </Button>
                         </Form.Item>
                     </Form>
                 </div>

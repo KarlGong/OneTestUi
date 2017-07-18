@@ -2,38 +2,53 @@
     margin-bottom: 12px;
 }
 
+.test-case-editor .rich-text-editor .editor {
+    height: 81px;
+    overflow: auto;
+}
+
 .test-case-editor .test-step {
-    height: 66px;
     margin-bottom: 15px;
-    display: flex;
-    align-items: center;
+}
+
+.test-case-editor .test-step:after {
+    content:"";
+    display: block;
+    clear: both;
 }
 
 .test-case-editor .action {
-    width: 70%
+    width: 45%;
+    float: left;
 }
 
 .test-case-editor .expected-result {
     width: 45%;
-    margin-left: 20px
+    margin-left: 20px;
+    float: left;
 }
 
-.test-case-editor .button{
+.test-case-editor .button {
     cursor: pointer;
     font-size: 18px;
     margin-left: 17px;
+    margin-top: 5px;
+    padding-top: 1px;
     opacity: 0.6;
+    float: left;
 }
 
-.test-case-editor .insert {
-    color: #72b84c;
+.test-case-editor .button:hover {
+    opacity: 1;
+}
+
+.test-case-editor .copy {
+    color: #109cfc;
 }
 
 .test-case-editor .delete {
     color: #da4d5e;
 }
 
-.test-case-editor .button:hover {
-    opacity: 1;
-}
+
 

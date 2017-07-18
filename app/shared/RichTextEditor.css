@@ -4,7 +4,7 @@
     position: relative;
 }
 
-.rich-text-editor.read-only {
+.rich-text-editor.view-mode {
     border-color: transparent !important;
 }
 
@@ -65,7 +65,7 @@
     line-height: 1.5;
 }
 
-.rich-text-editor .editor > * > * + * {
+.rich-text-editor .editor > * + * {
     margin-top: 0.8em;
 }
 

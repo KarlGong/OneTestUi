@@ -147,7 +147,8 @@ const rules = [
                     case "underlined":
                         return <span style={{textDecoration: "underline"}} type="underlined">{children}</span>;
                     case "color":
-                        return <span style={{color: object.data.color}} type="color" color={object.data.color}>{children}</span>;
+                        return <span style={{color: object.data.color}} type="color"
+                                     color={object.data.color}>{children}</span>;
                 }
             }
         }
@@ -166,7 +167,7 @@ class RichTextEditor extends Component {
 
     static defaultProps = {
         defaultValue: "<p></p>",
-        readOnly: false
+        viewMode: false
     };
 
     @observable isFocus = false;
@@ -242,7 +243,10 @@ class RichTextEditor extends Component {
 
     render = () => {
         return (
-            <div className={cs("rich-text-editor", {"active": this.isFocus, "read-only": this.props.readOnly}, this.props.className)}
+            <div className={cs("rich-text-editor", {
+                "active": this.isFocus,
+                "view-mode": this.props.viewMode
+            }, this.props.className)}
                  style={this.props.style}>
                 {this.renderToggleButton()}
                 {this.renderToolbar()}
@@ -252,10 +256,10 @@ class RichTextEditor extends Component {
     };
 
     renderToggleButton = () => {
-        return ( this.props.readOnly ? null :
-            <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
-                <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
-            </div>
+        return ( this.props.viewMode ? null :
+                <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
+                    <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
+                </div>
         )
     };
 
@@ -266,7 +270,7 @@ class RichTextEditor extends Component {
      */
 
     renderToolbar = () => {
-        return ( this.isToolbarShow ?
+        return ( !this.props.viewMode && this.isToolbarShow ?
                 <div className="toolbar">
                     {this.renderMarkButton("bold", "editor-b")}
                     {this.renderMarkButton("italic", "editor-i")}
@@ -544,22 +548,21 @@ class RichTextEditor extends Component {
 
     renderEditor = () => {
         return (
-            <div className="editor">
-                <Editor
-                    spellCheck
-                    readOnly={this.props.readOnly}
-                    schema={schema}
-                    state={this.state.state}
-                    onChange={this.onChange}
-                    onKeyDown={this.onKeyDown}
-                    onFocus={() => {
-                        this.isFocus = true
-                    }}
-                    onBlur={() => {
-                        this.isFocus = false
-                    }}
-                />
-            </div>
+            <Editor
+                className="editor"
+                spellCheck
+                readOnly={this.props.viewMode}
+                schema={schema}
+                state={this.state.state}
+                onChange={this.onChange}
+                onKeyDown={this.onKeyDown}
+                onFocus={() => {
+                    this.isFocus = true
+                }}
+                onBlur={() => {
+                    this.isFocus = false
+                }}
+            />
         )
     };
 }
