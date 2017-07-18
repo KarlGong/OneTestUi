@@ -1,9 +1,11 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, toJS} from "mobx";
-import {Spin, Row, Col, Form, Button, Icon, Input} from "antd";
+import {Spin, Row, Col, Form, Button, Icon, Input, message} from "antd";
 import axios from "axios";
 import RichTextEditor from "shared/RichTextEditor";
+import guid from "shared/Guid";
+import clipboard from "shared/Clipboard";
 import "./TestCaseEditorPanel.css";
 
 @observer
@@ -25,7 +27,8 @@ class TestCaseEditorPanel extends Component {
                 <div className="test-case-editor">
                     <Form layout="vertical">
                         <Form.Item label="Name" validateStatus="error">
-                            <Input key={this.loading} size="default" style={{width: "45%"}} defaultValue={this.testCase.name}/>
+                            <Input key={this.loading} size="default" style={{width: "45%"}}
+                                   defaultValue={this.testCase.name}/>
                         </Form.Item>
                         <Form.Item label="Summary">
                             <RichTextEditor key={this.loading} defaultValue={this.testCase.summary}/>
@@ -34,29 +37,38 @@ class TestCaseEditorPanel extends Component {
                             <RichTextEditor key={this.loading} defaultValue={this.testCase.precondition}/>
                         </Form.Item>
                         <Form.Item label="Test Steps">
-                            {this.testCase.testSteps.map((item, i) =>
-                                <div key={i} className="test-step">
-                                    <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
-                                        <Icon type="plus"/> Add Test Step
-                                    </Button>
-                                    
-                                    <RichTextEditor key={"action" + this.loading} className="action" defaultValue={item.action}/>
-                                    <RichTextEditor key={"result" + this.loading} className="expected-result" defaultValue={item.expectedResult}/>
-                                    <Icon
-                                        className="copy button"
-                                        type="copy"
-                                        onClick
-                                    />
-                                    <Icon
-                                        className="delete button"
-                                        type="close-circle-o"
-                                        onClick
-                                    />
+                            {this.testCase.testSteps.map((testStep, index) =>
+                                <div key={testStep.guid}>
+                                    <div className="spliter-wrapper">
+                                        <div className="spliter">
+                                            <Button icon="plus" size="small" onClick={this.addTestStep.bind(this, index)} className="add action-button">Add Test Step</Button>
+                                            <Button icon="paste" size="small" onClick={this.pasteTestStep.bind(this, index)} className="paste action-button">Paste Test Step</Button>
+                                        </div>
+                                    </div>
+                                    <div className="test-step">
+                                        <RichTextEditor key={"action" + this.loading} className="action"
+                                                        defaultValue={testStep.action}/>
+                                        <RichTextEditor key={"result" + this.loading} className="expected-result"
+                                                        defaultValue={testStep.expectedResult}/>
+                                        <Button
+                                            className="copy action-icon"
+                                            icon="copy"
+                                            shape="circle"
+                                            onClick={this.copyTestStep.bind(this, [testStep])}
+                                        />
+                                        <Button
+                                            className="delete action-icon"
+                                            icon="close-circle-o"
+                                            shape="circle"
+                                            onClick={this.removeTestStep.bind(this, index)}
+                                        />
+                                    </div>
                                 </div>
                             )}
-                            <Button type="dashed" onClick={this.addTestStep} style={{width: "100%"}}>
-                                <Icon type="plus"/> Add Test Step
-                            </Button>
+                            <div className="spliter" style={{marginTop: "10px"}}>
+                                <Button icon="plus" size="small" onClick={this.addTestStep.bind(this, -1)} className="add action-button">Add Test Step</Button>
+                                <Button icon="paste" size="small" onClick={this.pasteTestStep.bind(this, -1)} className="paste action-button">Paste Test Step</Button>
+                            </div>
                         </Form.Item>
                     </Form>
                 </div>
@@ -64,13 +76,51 @@ class TestCaseEditorPanel extends Component {
         );
     };
 
-    addTestStep = (e) => {
-        this.testCase.testSteps.push({
-            action: "<p></p>",
-            expectedResult: "<p></p>"
-        });
+    addTestStep = (index) => {
+        if (index === -1) {
+            this.testCase.testSteps.push({
+                guid: guid(),
+                action: "<p></p>",
+                expectedResult: "<p></p>"
+            });
+        } else {
+            this.testCase.testSteps.splice(index, 0, {
+                guid: guid(),
+                action: "<p></p>",
+                expectedResult: "<p></p>"
+            });
+        }
     };
 
+    removeTestStep = (index) => {
+        this.testCase.testSteps.splice(index, 1);
+    };
+
+    copyTestStep = (testSteps) => {
+        clipboard.set("testSteps", testSteps);
+        message.success("Test Step is copied successfully")
+    };
+
+    pasteTestStep = (index) => {
+        const testSteps = clipboard.get("testSteps");
+        if (!testSteps) {
+            message.warning("No test step is copied");
+            return;
+        }
+        if (index === -1) {
+            testSteps.map((testStep, i) => {
+                let newTestStep = testStep;
+                newTestStep.guid = guid();
+                this.testCase.testSteps.push(newTestStep);
+            });
+        } else {
+            testSteps.map((testStep, i) => {
+                let newTestStep = testStep;
+                newTestStep.guid = guid();
+                this.testCase.testSteps.splice(index + i, 0, newTestStep);
+            });
+        }
+    }
 }
 
 export default TestCaseEditorPanel;

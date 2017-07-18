@@ -7,8 +7,30 @@
     overflow: auto;
 }
 
-.test-case-editor .test-step {
-    margin-bottom: 15px;
+.test-case-editor .spliter-wrapper {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.test-case-editor .spliter-wrapper .spliter {
+    height: 0;
+    overflow: hidden;
+}
+
+.test-case-editor .spliter-wrapper:hover .spliter {
+    height: 28px;
+}
+
+.test-case-editor .spliter {
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border: 1px #d9d9d9 dashed;
+    border-radius: 4px;
+    width: 100%;
+    height: 28px;
+}
+
+.test-case-editor .spliter:hover {
+    border-color: #108ee9;
 }
 
 .test-case-editor .test-step:after {
@@ -28,17 +50,14 @@
     float: left;
 }
 
-.test-case-editor .button {
-    cursor: pointer;
-    font-size: 18px;
-    margin-left: 17px;
-    margin-top: 5px;
-    padding-top: 1px;
+.test-case-editor .action-icon {
+    margin-left: 12px;
     opacity: 0.6;
     float: left;
+    border: none;
 }
 
-.test-case-editor .button:hover {
+.test-case-editor .action-icon:hover {
     opacity: 1;
 }
 
@@ -48,6 +67,19 @@
 
 .test-case-editor .delete {
     color: #da4d5e;
+}
+
+.test-case-editor .action-button {
+    border: none;
+    margin-top: 2px;
+}
+
+.test-case-editor .add {
+    margin-left: 33.5%;
+}
+
+.test-case-editor .paste {
+    margin-left: 3.5%;
 }
 
 
