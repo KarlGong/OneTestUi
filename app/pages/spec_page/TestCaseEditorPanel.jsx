@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, toJS} from "mobx";
-import {Spin, Row, Col, Form, Button, Icon, Input, message} from "antd";
+import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm} from "antd";
 import axios from "axios";
 import RichTextEditor from "shared/RichTextEditor";
-import guid from "shared/Guid";
-import clipboard from "shared/Clipboard";
+import guid from "shared/guid";
+import clipboard from "shared/clipboard";
 import "./TestCaseEditorPanel.css";
 
 @observer
@@ -56,12 +56,13 @@ class TestCaseEditorPanel extends Component {
                                             shape="circle"
                                             onClick={this.copyTestStep.bind(this, [testStep])}
                                         />
-                                        <Button
-                                            className="delete action-icon"
-                                            icon="close-circle-o"
-                                            shape="circle"
-                                            onClick={this.removeTestStep.bind(this, index)}
-                                        />
+                                        <Popconfirm placement="topRight" title="Are you sure?" okText="Yes" cancelText="No" onConfirm={this.removeTestStep.bind(this, index)}>
+                                            <Button
+                                                className="delete action-icon"
+                                                icon="close-circle-o"
+                                                shape="circle"
+                                            />
+                                        </Popconfirm>
                                     </div>
                                 </div>
                             )}

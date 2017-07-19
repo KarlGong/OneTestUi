@@ -3,8 +3,8 @@ import {observer} from "mobx-react";
 import {observable, action, toJS} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
-import event from "shared/Event";
-import contextMenu from "shared/ContextMenu";
+import event from "shared/event";
+import contextMenu from "shared/contextMenu";
 import TestCaseEditorPanel from "./TestCaseEditorPanel";
 
 @observer
