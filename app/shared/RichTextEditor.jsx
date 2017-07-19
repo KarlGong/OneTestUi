@@ -167,7 +167,8 @@ class RichTextEditor extends Component {
 
     static defaultProps = {
         defaultValue: "<p></p>",
-        viewMode: false
+        viewMode: false,
+        onChange: (value) => {}
     };
 
     @observable isFocus = false;
@@ -185,6 +186,7 @@ class RichTextEditor extends Component {
 
     onChange = (state) => {
         this.setState({state});
+        this.props.onChange(htmlSerializer.serialize(state));
     };
 
     /**

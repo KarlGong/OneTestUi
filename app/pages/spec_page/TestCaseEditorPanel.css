@@ -75,11 +75,11 @@
 }
 
 .test-case-editor .add {
-    margin-left: 33.5%;
+    margin-left: calc(44.5% - 110px);
 }
 
 .test-case-editor .paste {
-    margin-left: 3.5%;
+    margin-left: 30px;
 }
 
 
