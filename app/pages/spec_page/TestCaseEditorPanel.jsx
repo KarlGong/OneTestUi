@@ -10,7 +10,7 @@ import "./TestCaseEditorPanel.css";
 
 @observer
 class TestCaseEditorPanel extends Component {
-    @observable testCase = {tags: [], testSteps: []};
+    @observable testCase = {executionType: "0", importance: "1", testSteps: [], tags: []};
     @observable loading = false;
     @observable saving = false;
     @observable possibleTags = [];
@@ -18,10 +18,11 @@ class TestCaseEditorPanel extends Component {
     componentDidMount = () => {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {
-            this.testCase = response.data;
-            this.testCase.testSteps.map((testStep) => testStep.guid = guid());
-            this.testCase.executionType = this.testCase.executionType.toString();
-            this.testCase.importance = this.testCase.importance.toString();
+            let testCase = response.data;
+            testCase.testSteps.map((testStep) => testStep.guid = guid());
+            testCase.executionType = testCase.executionType.toString();
+            testCase.importance = testCase.importance.toString();
+            this.testCase = testCase;
             this.loading = false;
         })
     };
@@ -46,7 +47,7 @@ class TestCaseEditorPanel extends Component {
                         </Form.Item>
                         <Form.Item label="Test Steps">
                             {this.testCase.testSteps.map((testStep, index) =>
-                                <div key={toJS(testStep.guid)}>
+                                <div key={testStep.guid}>
                                     <div className="spliter-wrapper">
                                         <div className="spliter">
                                             <Button icon="plus" size="small"
@@ -92,14 +93,14 @@ class TestCaseEditorPanel extends Component {
                     <Form layout="inline" style={{display: "flex", alignItems: "center"}}>
                         <Form.Item label="Execution Type">
                             <Radio.Group key={this.loading} size="default"
-                                         defaultValue={this.testCase.executionType || "0"}
+                                         defaultValue={this.testCase.executionType}
                                          onChange={(e) => this.testCase.executionType = e.target.value}>
                                 <Radio.Button value="0">Manual</Radio.Button>
                                 <Radio.Button value="1">Automated</Radio.Button>
                             </Radio.Group>
                         </Form.Item>
                         <Form.Item label="Importance">
-                            <Select key={this.loading} size="default" defaultValue={this.testCase.importance || "1" }
+                            <Select key={this.loading} size="default" defaultValue={this.testCase.importance}
                                     style={{width: "100px"}} onChange={(value) => this.testCase.importance = value}>
                                 <Select.Option value="0">High</Select.Option>
                                 <Select.Option value="1">Medium</Select.Option>
