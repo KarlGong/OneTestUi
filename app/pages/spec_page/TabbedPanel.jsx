@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable} from "mobx";
+import {observable, action} from "mobx";
 import axios from "axios";
 import {Tabs, Button} from "antd";
 import event from "shared/event";
@@ -49,6 +49,7 @@ export default class TabbedPanel extends Component {
         this.panels.push(panel);
     }
 
+    @action
     removePanel(key, action) {
         if (action === "remove") {
             if (this.activePanelKey === key) {

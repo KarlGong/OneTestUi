@@ -37,8 +37,7 @@ class ContextMenuComponent extends Component {
     }
 
     render() {
-        return <Menu style={{position: "absolute", top: this.props.y, left: this.props.x}} mode="inline"
-                     onClick={this.handleClick.bind(this)} inlineIndent={15}>
+        return <Menu style={{position: "absolute", top: this.props.y, left: this.props.x}} onClick={this.handleClick.bind(this)} inlineIndent={15}>
             {this.props.items.map((item, i) => item ?
                 <Menu.Item style={{height: "25px", lineHeight: "25px"}} key={i} data={item}>{item.name}</Menu.Item> :
                 <Menu.Divider key={i}/>

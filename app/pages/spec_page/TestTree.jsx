@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable, action, toJS} from "mobx";
+import {observable, action, toJS, runInAction} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
 import event from "shared/event";
@@ -16,8 +16,10 @@ export default class TestTree extends Component {
     componentDidMount() {
         this.loading = true;
         axios.get("/api/project/1/rootsuite").then((response) => {
-            this.treeData.push(response.data);
-            this.loading = false;
+            runInAction(() => {
+                this.treeData.push(response.data);
+                this.loading = false;
+            });
         })
     }
 

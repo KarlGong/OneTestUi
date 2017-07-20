@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable, toJS} from "mobx";
+import {observable, toJS, untracked, runInAction, action} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
 import axios from "axios";
 import RichTextEditor from "shared/RichTextEditor";
@@ -18,12 +18,13 @@ class TestCaseEditorPanel extends Component {
     componentDidMount = () => {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {
-            let testCase = response.data;
-            testCase.testSteps.map((testStep) => testStep.guid = guid());
-            testCase.executionType = testCase.executionType.toString();
-            testCase.importance = testCase.importance.toString();
-            this.testCase = testCase;
-            this.loading = false;
+            runInAction(() => {
+                this.testCase = response.data;
+                this.testCase.testSteps.map((testStep) => testStep.guid = guid());
+                this.testCase.executionType = this.testCase.executionType.toString();
+                this.testCase.importance = this.testCase.importance.toString();
+                this.loading = false;
+            });
         })
     };
 
@@ -34,15 +35,15 @@ class TestCaseEditorPanel extends Component {
                     <Form layout="vertical">
                         <Form.Item label="Name" validateStatus="error">
                             <Input key={this.loading} size="default" style={{width: "45%"}}
-                                   defaultValue={this.testCase.name}
+                                   defaultValue={untracked(() => this.testCase.name)} // it's a trick to untrack changes here
                                    onChange={(e) => this.testCase.name = e.target.value}/>
                         </Form.Item>
                         <Form.Item label="Summary">
-                            <RichTextEditor key={this.loading} defaultValue={this.testCase.summary}
+                            <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testCase.summary)}
                                             onChange={(value) => this.testCase.summary = value}/>
                         </Form.Item>
                         <Form.Item label="Precondition">
-                            <RichTextEditor key={this.loading} defaultValue={this.testCase.precondition}
+                            <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testCase.precondition)}
                                             onChange={(value) => this.testCase.precondition = value}/>
                         </Form.Item>
                         <Form.Item label="Test Steps">
@@ -60,10 +61,10 @@ class TestCaseEditorPanel extends Component {
                                     </div>
                                     <div className="test-step">
                                         <RichTextEditor key={"action" + this.loading} className="action"
-                                                        defaultValue={testStep.action}
+                                                        defaultValue={untracked(() => testStep.action)}
                                                         onChange={(value) => testStep.action = value}/>
                                         <RichTextEditor key={"result" + this.loading} className="expected-result"
-                                                        defaultValue={testStep.expectedResult}
+                                                        defaultValue={untracked(() => testStep.expectedResult)}
                                                         onChange={(value) => testStep.expectedResult = value}/>
                                         <Button
                                             className="copy action-icon"
@@ -154,6 +155,7 @@ class TestCaseEditorPanel extends Component {
         message.success("Test Step is copied successfully")
     };
 
+    @action
     pasteTestStep = (index) => {
         const testSteps = clipboard.get("testSteps");
         if (!testSteps) {
