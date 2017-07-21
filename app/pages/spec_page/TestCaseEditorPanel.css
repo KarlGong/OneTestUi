@@ -1,3 +1,7 @@
+.test-case-editor .ant-form-item-label>label {
+    font-size: 13px;
+}
+
 .test-case-editor .ant-row {
     margin-bottom: 12px;
 }

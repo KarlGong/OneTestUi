@@ -1,0 +1,68 @@
+.test-case-view .ant-form-item-label>label {
+    font-size: 13px;
+}
+
+.test-case-view .ant-row {
+    margin-bottom: 12px;
+}
+
+.test-case-view .spliter {
+    border-top: 1px #d9d9d9 dashed;
+    width: 100%;
+}
+
+.test-case-view .test-step {
+    margin-bottom: 10px;
+}
+
+.test-case-view .test-step:after {
+    content:"";
+    display: block;
+    clear: both;
+}
+
+.test-case-view .action {
+    width: 45%;
+    float: left;
+}
+
+.test-case-view .expected-result {
+    width: 45%;
+    float: left;
+    margin-left: 20px;
+}
+
+.test-case-view .action-icon {
+    margin-left: 12px;
+    opacity: 0.6;
+    float: left;
+    border: none;
+}
+
+.test-case-view .action-icon:hover {
+    opacity: 1;
+}
+
+.test-case-view .copy {
+    color: #109cfc;
+}
+
+.test-case-view .delete {
+    color: #da4d5e;
+}
+
+.test-case-view .action-button {
+    border: none;
+    margin-top: 2px;
+}
+
+.test-case-view .add {
+    margin-left: calc(44.5% - 110px);
+}
+
+.test-case-view .paste {
+    margin-left: 30px;
+}
+
+
+

@@ -6,6 +6,7 @@ import axios from "axios";
 import event from "shared/event";
 import contextMenu from "shared/contextMenu";
 import TestCaseEditorPanel from "./TestCaseEditorPanel";
+import TestCaseViewPanel from "./TestCaseViewPanel";
 
 @observer
 export default class TestTree extends Component {
@@ -115,7 +116,7 @@ export default class TestTree extends Component {
                     },
                     {
                         name: "Edit",
-                        onClick: () => console.log("open")
+                        onClick: () => this.editCase(testNode)
                     },
                     {
                         name: "Copy",
@@ -140,7 +141,17 @@ export default class TestTree extends Component {
             {
                 key: testCase.type + "-" + testCase.id,
                 name: testCase.name,
-                view: <TestCaseEditorPanel testCaseId={testCase.id}/>
+                content: <TestCaseViewPanel testCaseId={testCase.id}/>
+            }
+        );
+    }
+
+    editCase(testCase) {
+        event.emit("TabbedPanel.addPanel",
+            {
+                key: testCase.type + "-" + testCase.id,
+                name: testCase.name,
+                content: <TestCaseEditorPanel testCaseId={testCase.id}/>
             }
         );
     }

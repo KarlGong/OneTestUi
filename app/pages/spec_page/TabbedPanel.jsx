@@ -31,7 +31,7 @@ export default class TabbedPanel extends Component {
                     onEdit={this.removePanel.bind(this)}
                 >
                     {this.panels.map(panel =>
-                        <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.view}</Tabs.TabPane>)}
+                        <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.content}</Tabs.TabPane>)}
                 </Tabs> : <div className="info">Select TestCase / TestSuite in left panel.</div>}
             </div>
         );
