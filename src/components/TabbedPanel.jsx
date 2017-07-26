@@ -3,7 +3,7 @@ import {observer} from "mobx-react";
 import {observable, action} from "mobx";
 import axios from "axios";
 import {Tabs, Button} from "antd";
-import event from "shared/event";
+import event from "~/utils/event";
 import "./TabbedPanel.css";
 
 

@@ -1,4 +1,6 @@
 const path = require("path");
+const srcPath = path.join(__dirname, "src");
+const libPath = path.join(__dirname, "node_modules");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -8,7 +10,7 @@ module.exports = {
         "react-hot-loader/patch",
         "webpack-dev-server/client?http://localhost:3000",
         "webpack/hot/only-dev-server",
-        path.join(__dirname, "app/index")
+        path.join(__dirname, "src/index")
     ],
     output: {
         path: path.join(__dirname, "build"),
@@ -17,7 +19,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "app/index.tpl.html",
+            template: "src/index.tpl.html",
             inject: "body",
             filename: "index.html"
         }),
@@ -26,7 +28,7 @@ module.exports = {
     resolve: {
         extensions: [".js", ".jsx"],
         alias: {
-            shared: path.join(__dirname, "app/shared")
+            "~": srcPath
         }
     },
     module: {
@@ -34,12 +36,12 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 use: ["babel-loader"],
-                include: path.join(__dirname, "app")
+                include: srcPath
             },
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"],
-                include: path.join(__dirname, "app")
+                include: srcPath
             },
             {
                 test: /\.less$/,
@@ -51,11 +53,11 @@ module.exports = {
                         query: {
                             "sourceMap": true,
                             "modifyVars": {
-                                "@icon-url": "'/app/assets/fonts/antd-iconfont/iconfont'"
+                                "@icon-url": "'/src/assets/fonts/antd-iconfont/iconfont'"
                             }
                         }
                     }],
-                include: [path.join(__dirname, "app"), path.join(__dirname, "node_modules")]
+                include: [srcPath, libPath]
             },
             {
                 test: /\.(jpe?g|png|gif|svg|eot|ttf|woff)$/,
@@ -65,7 +67,7 @@ module.exports = {
                         name: "[path][name].[ext]",
                     }
                 }],
-                include: path.join(__dirname, "app")
+                include: srcPath
             }
         ]
     }

@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {observable} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
+import TabbedPanel from "~/components/TabbedPanel";
 import TestTree from "./TestTree";
-import TabbedPanel from "./TabbedPanel";
 
 class SpecPage extends Component {
 

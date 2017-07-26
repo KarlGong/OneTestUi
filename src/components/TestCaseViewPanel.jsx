@@ -3,9 +3,9 @@ import {observer} from "mobx-react";
 import {observable, toJS, untracked, runInAction, action} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
 import axios from "axios";
-import RichTextEditor from "shared/RichTextEditor";
-import guid from "shared/guid";
-import {executionMap, importanceMap} from "shared/store";
+import RichTextEditor from "~/components/RichTextEditor";
+import guid from "~/utils/guid";
+import {executionMap, importanceMap} from "~/utils/store";
 import "./TestCaseViewPanel.css";
 
 @observer

@@ -3,10 +3,10 @@ import {observer} from "mobx-react";
 import {observable, action, toJS, runInAction} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
-import event from "shared/event";
-import contextMenu from "shared/contextMenu";
-import TestCaseEditorPanel from "./TestCaseEditorPanel";
-import TestCaseViewPanel from "./TestCaseViewPanel";
+import event from "~/utils/event";
+import contextMenu from "~/utils/contextMenu";
+import TestCaseEditorPanel from "~/components/TestCaseEditorPanel";
+import TestCaseViewPanel from "~/components/TestCaseViewPanel";
 
 @observer
 export default class TestTree extends Component {
@@ -151,7 +151,7 @@ export default class TestTree extends Component {
             {
                 key: testCase.type + "-" + testCase.id,
                 name: testCase.name,
-                content: <TestCaseEditorPanel testCaseId={testCase.id}/>
+                content: <TestCaseEditorPanel mode="edit" testCaseId={testCase.id}/>
             }
         );
     }

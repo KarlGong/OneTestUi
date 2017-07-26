@@ -3,10 +3,10 @@ import {observer} from "mobx-react";
 import {observable, toJS, untracked, runInAction, action} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
 import axios from "axios";
-import RichTextEditor from "shared/RichTextEditor";
-import guid from "shared/guid";
-import clipboard from "shared/clipboard";
-import {executionMap, importanceMap} from "shared/store";
+import RichTextEditor from "~/components/RichTextEditor";
+import guid from "~/utils/guid";
+import clipboard from "~/utils/clipboard";
+import {executionMap, importanceMap} from "~/utils/store";
 import "./TestCaseEditorPanel.css";
 
 @observer
@@ -16,17 +16,25 @@ class TestCaseEditorPanel extends Component {
     @observable saving = false;
     @observable possibleTags = [];
 
+    static defaultProps = {
+        testCaseId: null, // for edit mode
+        testSuiteId: null, // for add mode
+        mode: "add" // add or edit
+    };
+
     componentDidMount = () => {
-        this.loading = true;
-        axios.get("/api/case/" + this.props.testCaseId).then((response) => {
-            runInAction(() => {
-                this.testCase = response.data;
-                this.testCase.testSteps.map((testStep) => testStep.guid = guid());
-                this.testCase.executionType = this.testCase.executionType.toString();
-                this.testCase.importance = this.testCase.importance.toString();
-                this.loading = false;
-            });
-        })
+        if (this.props.mode === "edit") {
+            this.loading = true;
+            axios.get("/api/case/" + this.props.testCaseId).then((response) => {
+                runInAction(() => {
+                    this.testCase = response.data;
+                    this.testCase.testSteps.map((testStep) => testStep.guid = guid());
+                    this.testCase.executionType = this.testCase.executionType.toString();
+                    this.testCase.importance = this.testCase.importance.toString();
+                    this.loading = false;
+                });
+            })
+        }
     };
 
     render = () => {
@@ -187,11 +195,21 @@ class TestCaseEditorPanel extends Component {
     };
 
     save = () => {
-        this.saving = true;
-        axios.post("/api/case/" + this.testCase.id, this.testCase).then((response) => {
-            message.success("Test case is saved successfully");
-            this.saving = false;
-        })
+        if (this.props.mode === "edit") {
+            this.saving = true;
+            axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {
+                message.success("Test case is saved successfully");
+                this.saving = false;
+            })
+        } else {
+            this.saving = true;
+            axios.put("/api/case", Object.assign({}, this.testCase, {testSuiteId: this.props.testSuiteId})).then((response) => {
+                message.success("Test case is added successfully");
+                this.props.mode = "edit";
+                this.props.testCaseId = response.data;
+                this.saving = false;
+            })
+        }
     }
 }
 
