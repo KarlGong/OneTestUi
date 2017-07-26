@@ -129,9 +129,8 @@ class TestCaseEditorPanel extends Component {
                             </Select>
                         </Form.Item>
                     </Form>
-                    <div style={{borderTop: "1px #d9d9d9 solid", padding: "20px 0"}}>
+                    <div style={{borderTop: "1px #d9d9d9 solid", padding: "18px 0"}}>
                         <Button type="primary" loading={this.saving} onClick={this.save}>Save</Button>
-                        <Button style={{marginLeft: "20px"}}>Cancel</Button>
                     </div>
                 </div>
             </Spin>

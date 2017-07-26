@@ -11,13 +11,15 @@
 }
 
 .tabbed-panel .ant-tabs-nav .ant-tabs-tab .anticon {
-    margin-right: 4px;
+    margin-right: 3px;
 }
 
 .tabbed-panel .ant-tabs-bar .ant-tabs-tab .anticon-close {
     opacity: 1 !important;
     font-size: 16px !important;
+    font-weight: bold !important;
     margin-top: -6px !important;
+    margin-right: 1px !important;
 }
 
 /*each tab panel*/

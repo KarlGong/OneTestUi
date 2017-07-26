@@ -10,13 +10,13 @@ import "./TabbedPanel.css";
 @observer
 export default class TabbedPanel extends Component {
     @observable panels = [];
-    @observable previewPanel = {name: <span><Icon type="lock" />Preview</span>, key: "preview", content: <div className="info">Select TestCase / TestSuite in left panel.</div>};
-    @observable activePanelKey = "preview";
+    @observable pinnedPanel = {name: <span><Icon type="file" />view</span>, key: "view", content: <div className="info">Select TestCase / TestSuite in left panel to view.</div>};
+    @observable activePanelKey = "view";
     disposers = [];
 
     componentDidMount() {
         this.disposers.push(event.on("TabbedPanel.addPanel", this.addPanel.bind(this)));
-        this.disposers.push(event.on("TabbedPanel.addPreviewPanel", this.addPreviewPanel.bind(this)));
+        this.disposers.push(event.on("TabbedPanel.addPinnedPanel", this.addPinnedPanel.bind(this)));
     }
 
     componentWillUnMount() {
@@ -32,7 +32,7 @@ export default class TabbedPanel extends Component {
                     onChange={this.selectPanel.bind(this)}
                     onEdit={this.removePanel.bind(this)}
                 >
-                    <Tabs.TabPane tab={this.previewPanel.name} key={this.previewPanel.key} closable={false}>{this.previewPanel.content}</Tabs.TabPane>
+                    <Tabs.TabPane tab={this.pinnedPanel.name} key={this.pinnedPanel.key} closable={false}>{this.pinnedPanel.content}</Tabs.TabPane>
                     {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.content}</Tabs.TabPane>)}
                 </Tabs>
@@ -52,9 +52,9 @@ export default class TabbedPanel extends Component {
         this.panels.push(panel);
     }
 
-    addPreviewPanel(panel) {
+    addPinnedPanel(panel) {
         this.activePanelKey = panel.key;
-        this.previewPanel = panel;
+        this.pinnedPanel = panel;
     }
 
     @action
@@ -72,7 +72,7 @@ export default class TabbedPanel extends Component {
                 } else if (this.panels.length > 1) {
                     this.activePanelKey = this.panels[1].key;
                 } else {
-                    this.activePanelKey = this.previewPanel.key;
+                    this.activePanelKey = this.pinnedPanel.key;
                 }
             }
             this.panels = this.panels.filter(panel => panel.key !== key);

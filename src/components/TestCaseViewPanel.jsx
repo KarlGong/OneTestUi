@@ -4,7 +4,9 @@ import {observable, toJS, untracked, runInAction, action} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
 import axios from "axios";
 import RichTextEditor from "~/components/RichTextEditor";
+import TestCaseEditorPanel from "~/components/TestCaseEditorPanel";
 import guid from "~/utils/guid";
+import event from "~/utils/event";
 import {executionMap, importanceMap} from "~/utils/store";
 import "./TestCaseViewPanel.css";
 
@@ -65,11 +67,23 @@ class TestCaseViewPanel extends Component {
                             <span>{this.testCase.tags.map((tag) => tag.value).join(", ")}</span>
                         </Form.Item>
                     </Form>
+                    <div style={{borderTop: "1px #d9d9d9 solid", padding: "18px 0"}}>
+                        <Button type="primary" onClick={this.edit}>Edit</Button>
+                    </div>
                 </div>
             </Spin>
         );
     };
 
+    edit = () => {
+        event.emit("TabbedPanel.addPanel",
+            {
+                key: "edit-case-" + this.testCase.id,
+                name: <span><Icon type="edit" />{this.testCase.name}</span>,
+                content: <TestCaseEditorPanel mode="edit" testCaseId={this.testCase.id}/>
+            }
+        );
+    }
 
 }
 
