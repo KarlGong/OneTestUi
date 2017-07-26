@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
+import {render, unmountComponentAtNode} from "react-dom";
 import {observable, action, toJS, runInAction} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
 import axios from "axios";
@@ -7,6 +8,8 @@ import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
 import TestCaseEditorPanel from "~/components/TestCaseEditorPanel";
 import TestCaseViewPanel from "~/components/TestCaseViewPanel";
+import addTestCaseModal from "~/utils/addTestCaseModal";
+import addTestSuiteModal from "~/utils/addTestSuiteModal";
 
 @observer
 export default class TestTree extends Component {
@@ -31,7 +34,7 @@ export default class TestTree extends Component {
                 return <Tree.TreeNode data={item} key={key} title={item.name} isLeaf/>;
             } else { // test suite
                 return <Tree.TreeNode data={item} key={key}
-                                      title={item.name + " (" + item.count + ")"}>{loop(item.children)}</Tree.TreeNode>;
+                                      title={item.name}>{loop(item.children)}</Tree.TreeNode>;
             }
         });
 
@@ -95,11 +98,11 @@ export default class TestTree extends Component {
                     },
                     {
                         name: "Add Test Suite",
-                        onClick: () => console.log("clicked")
+                        onClick: () => this.addSuite(testNode)
                     },
                     {
                         name: "Add Test Case",
-                        onClick: () => console.log("clicked")
+                        onClick: () => this.addCase(testNode)
                     },
                     null,
                     {
@@ -155,4 +158,12 @@ export default class TestTree extends Component {
             }
         );
     }
+
+    addSuite(testSuite) {
+        addTestSuiteModal.open(testSuite.id);
+    };
+
+    addCase(testSuite) {
+        addTestCaseModal.open(testSuite.id);
+    };
 }

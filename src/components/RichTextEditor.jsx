@@ -175,7 +175,7 @@ class RichTextEditor extends Component {
     @observable isToolbarShow = false;
 
     state = {
-        state: htmlSerializer.deserialize(this.props.defaultValue)
+        state: htmlSerializer.deserialize(this.props.defaultValue || "<p></p>")
     };
 
     /**

@@ -17,24 +17,20 @@ class TestCaseEditorPanel extends Component {
     @observable possibleTags = [];
 
     static defaultProps = {
-        testCaseId: null, // for edit mode
-        testSuiteId: null, // for add mode
-        mode: "add" // add or edit
+        testCaseId: null,
     };
 
     componentDidMount = () => {
-        if (this.props.mode === "edit") {
-            this.loading = true;
-            axios.get("/api/case/" + this.props.testCaseId).then((response) => {
-                runInAction(() => {
-                    this.testCase = response.data;
-                    this.testCase.testSteps.map((testStep) => testStep.guid = guid());
-                    this.testCase.executionType = this.testCase.executionType.toString();
-                    this.testCase.importance = this.testCase.importance.toString();
-                    this.loading = false;
-                });
-            })
-        }
+        this.loading = true;
+        axios.get("/api/case/" + this.props.testCaseId).then((response) => {
+            runInAction(() => {
+                this.testCase = response.data;
+                this.testCase.testSteps.map((testStep) => testStep.guid = guid());
+                this.testCase.executionType = this.testCase.executionType.toString();
+                this.testCase.importance = this.testCase.importance.toString();
+                this.loading = false;
+            });
+        })
     };
 
     render = () => {
@@ -194,21 +190,11 @@ class TestCaseEditorPanel extends Component {
     };
 
     save = () => {
-        if (this.props.mode === "edit") {
-            this.saving = true;
-            axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {
-                message.success("Test case is saved successfully");
-                this.saving = false;
-            })
-        } else {
-            this.saving = true;
-            axios.put("/api/case", Object.assign({}, this.testCase, {testSuiteId: this.props.testSuiteId})).then((response) => {
-                message.success("Test case is added successfully");
-                this.props.mode = "edit";
-                this.props.testCaseId = response.data;
-                this.saving = false;
-            })
-        }
+        this.saving = true;
+        axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {
+            message.success("Test case is saved successfully");
+            this.saving = false;
+        })
     }
 }
 
