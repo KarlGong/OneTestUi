@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, action} from "mobx";
 import axios from "axios";
-import {Tabs, Button} from "antd";
+import {Tabs, Button, Icon} from "antd";
 import event from "~/utils/event";
 import "./TabbedPanel.css";
 
@@ -10,19 +10,21 @@ import "./TabbedPanel.css";
 @observer
 export default class TabbedPanel extends Component {
     @observable panels = [];
-    @observable activePanelKey;
-    disposer;
+    @observable previewPanel = {name: <span><Icon type="lock" />Preview</span>, key: "preview", content: <div className="info">Select TestCase / TestSuite in left panel.</div>};
+    @observable activePanelKey = "preview";
+    disposers = [];
 
     componentDidMount() {
-        this.disposer = event.on("TabbedPanel.addPanel", this.addPanel.bind(this));
+        this.disposers.push(event.on("TabbedPanel.addPanel", this.addPanel.bind(this)));
+        this.disposers.push(event.on("TabbedPanel.addPreviewPanel", this.addPreviewPanel.bind(this)));
     }
 
     componentWillUnMount() {
-        this.disposer();
+        this.disposers.map((disposer) => disposer());
     }
 
     render() {
-        return (<div className="tabbed-panel">{this.panels.length ?
+        return (<div className="tabbed-panel">
                 <Tabs
                     hideAdd
                     type="editable-card"
@@ -30,9 +32,10 @@ export default class TabbedPanel extends Component {
                     onChange={this.selectPanel.bind(this)}
                     onEdit={this.removePanel.bind(this)}
                 >
+                    <Tabs.TabPane tab={this.previewPanel.name} key={this.previewPanel.key} closable={false}>{this.previewPanel.content}</Tabs.TabPane>
                     {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.content}</Tabs.TabPane>)}
-                </Tabs> : <div className="info">Select TestCase / TestSuite in left panel.</div>}
+                </Tabs>
             </div>
         );
     }
@@ -49,6 +52,11 @@ export default class TabbedPanel extends Component {
         this.panels.push(panel);
     }
 
+    addPreviewPanel(panel) {
+        this.activePanelKey = panel.key;
+        this.previewPanel = panel;
+    }
+
     @action
     removePanel(key, action) {
         if (action === "remove") {
@@ -63,6 +71,8 @@ export default class TabbedPanel extends Component {
                     this.activePanelKey = this.panels[lastIndex].key;
                 } else if (this.panels.length > 1) {
                     this.activePanelKey = this.panels[1].key;
+                } else {
+                    this.activePanelKey = this.previewPanel.key;
                 }
             }
             this.panels = this.panels.filter(panel => panel.key !== key);

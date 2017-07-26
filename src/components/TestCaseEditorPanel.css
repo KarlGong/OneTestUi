@@ -57,6 +57,7 @@
 .test-case-editor .action-icon {
     margin-left: 12px;
     opacity: 0.6;
+    font-size: 16px;
     float: left;
     border: none;
 }

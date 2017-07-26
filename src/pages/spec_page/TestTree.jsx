@@ -75,7 +75,7 @@ export default class TestTree extends Component {
         this.selectedKeys = [e.node.props.eventKey];
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
-            this.viewCase(testNode);
+            this.previewCase(testNode);
         }
     }
 
@@ -136,11 +136,21 @@ export default class TestTree extends Component {
         }
     }
 
+    previewCase(testCase) {
+        event.emit("TabbedPanel.addPreviewPanel",
+            {
+                key: "preview-" + testCase.type + "-" + testCase.id,
+                name: <span><Icon type="lock" />{testCase.name}</span>,
+                content: <TestCaseViewPanel testCaseId={testCase.id}/>
+            }
+        );
+    }
+
     viewCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
-                key: testCase.type + "-" + testCase.id,
-                name: testCase.name,
+                key: "view-" + testCase.type + "-" + testCase.id,
+                name: <span><Icon type="file" />{testCase.name}</span>,
                 content: <TestCaseViewPanel testCaseId={testCase.id}/>
             }
         );
@@ -149,8 +159,8 @@ export default class TestTree extends Component {
     editCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
-                key: testCase.type + "-" + testCase.id,
-                name: testCase.name,
+                key: "edit-" + testCase.type + "-" + testCase.id,
+                name: <span><Icon type="edit" />{testCase.name}</span>,
                 content: <TestCaseEditorPanel mode="edit" testCaseId={testCase.id}/>
             }
         );
