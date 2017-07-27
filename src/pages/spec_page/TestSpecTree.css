@@ -1,0 +1,29 @@
+.test-spec-tree .ant-tree-bottom_open:after,
+.test-spec-tree .ant-tree-roots_open:after{
+    content: "\E699" !important;
+    font-size: 13px !important;
+}
+
+.test-spec-tree .ant-tree-bottom_close:after,
+.test-spec-tree .ant-tree-roots_close:after{
+    content: "\E662" !important;
+    font-size: 13px !important;
+}
+
+.test-spec-tree .ant-tree-node-content-wrapper {
+    padding: 0 !important;
+}
+
+.test-spec-tree .ant-tree-switcher {
+    height: 20px !important;
+    line-height: 20px !important;
+}
+
+.test-spec-tree li:not(:last-child):before {
+    margin: 19px 0 !important;
+}
+
+.test-spec-tree li {
+    padding: 3px 0 !important;
+}
+

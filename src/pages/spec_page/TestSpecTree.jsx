@@ -3,6 +3,7 @@ import {observer} from "mobx-react";
 import {render, unmountComponentAtNode} from "react-dom";
 import {observable, action, toJS, runInAction} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover, Modal, message} from "antd";
+import clipboard from "~/utils/clipboard";
 import axios from "axios";
 import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
@@ -10,9 +11,10 @@ import TestCaseEditorPanel from "~/components/TestCaseEditorPanel";
 import TestCaseViewPanel from "~/components/TestCaseViewPanel";
 import addTestCaseModal from "~/utils/addTestCaseModal";
 import addTestSuiteModal from "~/utils/addTestSuiteModal";
+import "./TestSpecTree.css";
 
 @observer
-export default class TestTree extends Component {
+export default class TestSpecTree extends Component {
     @observable treeData = [];
     @observable loading = false;
     @observable selectedKeys = [];
@@ -42,7 +44,7 @@ export default class TestTree extends Component {
             <Spin spinning={this.loading}>
                 <div style={{height: "100%"}}>
                     <Tree
-                        class="draggable-tree"
+                        className="test-spec-tree"
                         draggable
                         showLine
                         showicon
@@ -104,6 +106,10 @@ export default class TestTree extends Component {
                         name: "Add Test Case",
                         onClick: () => this.addCase(testNode)
                     },
+                    {
+                        name: "Paste Test Case",
+                        onClick: () => this.pasteCase(testNode)
+                    },
                     null,
                     {
                         name: "Delete",
@@ -123,11 +129,7 @@ export default class TestTree extends Component {
                     },
                     {
                         name: "Copy",
-                        onClick: () => console.log("open")
-                    },
-                    {
-                        name: "Paste",
-                        onClick: () => console.log("open")
+                        onClick: () => this.copyCase(testNode)
                     },
                     null,
                     {
@@ -162,7 +164,7 @@ export default class TestTree extends Component {
         event.emit("TabbedPanel.addPinnedPanel",
             {
                 key: "view-case-" + testCase.id,
-                name: <span><Icon type="file" />{testCase.name}</span>,
+                name: <span><Icon type="file"/>{testCase.name}</span>,
                 content: <TestCaseViewPanel testCaseId={testCase.id}/>
             }
         );
@@ -172,11 +174,34 @@ export default class TestTree extends Component {
         addTestCaseModal.open(testSuite.id);
     };
 
+    copyCase(testCase) {
+        clipboard.set("testCase", testCase.id);
+        message.success("Test case is copied successfully");
+    }
+
+    pasteCase(testSuite) {
+        const testCaseId = clipboard.get("testCase");
+        if (!testCaseId) {
+            message.warning("No test case is copied");
+            return;
+        }
+        axios.get("/api/case/" + testCaseId).then((response) => {
+            let testCase = response.data;
+            return axios.put("/api/case",
+                Object.assign({}, testCase, {
+                    testSuiteId: testSuite.id,
+                    name: testCase.name + "-copy"
+                }));
+        }).then((response) => {
+            message.success("Test case is pasted successfully");
+        });
+    }
+
     editCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
                 key: "edit-case-" + testCase.id,
-                name: <span><Icon type="edit" />{testCase.name}</span>,
+                name: <span><Icon type="edit"/>{testCase.name}</span>,
                 content: <TestCaseEditorPanel mode="edit" testCaseId={testCase.id}/>
             }
         );

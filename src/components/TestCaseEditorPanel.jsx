@@ -155,7 +155,7 @@ class TestCaseEditorPanel extends Component {
 
     copyTestStep = (testSteps) => {
         clipboard.set("testSteps", testSteps);
-        message.success("Test Step is copied successfully")
+        message.success("Test Step is copied successfully");
     };
 
     @action

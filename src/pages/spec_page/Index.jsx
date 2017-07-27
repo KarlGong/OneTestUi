@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observable} from "mobx";
 import {Layout, Menu, Icon, Tree} from "antd";
 import TabbedPanel from "~/components/TabbedPanel";
-import TestTree from "./TestTree";
+import TestSpecTree from "./TestSpecTree";
 
 class SpecPage extends Component {
 
@@ -10,7 +10,7 @@ class SpecPage extends Component {
         return (
             <Layout>
                 <Layout.Sider width={200} style={{background: "#fff", borderRight: "1px #c0bdbd solid"}}>
-                    <TestTree/>
+                    <TestSpecTree/>
                 </Layout.Sider>
                 <Layout style={{ background: "#fff"}}>
                     <TabbedPanel/>
