@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {render, unmountComponentAtNode} from "react-dom";
 import {observable, action, toJS, runInAction} from "mobx";
-import {Layout, Menu, Icon, Tree, Spin, Popover} from "antd";
+import {Layout, Menu, Icon, Tree, Spin, Popover, Modal, message} from "antd";
 import axios from "axios";
 import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
@@ -107,7 +107,7 @@ export default class TestTree extends Component {
                     null,
                     {
                         name: "Delete",
-                        onClick: () => console.log("delete")
+                        onClick: () => this.deleteSuite(testNode)
                     }
                 ]);
                 break;
@@ -132,12 +132,31 @@ export default class TestTree extends Component {
                     null,
                     {
                         name: "Delete",
-                        onClick: () => console.log("delete")
+                        onClick: () => this.deleteCase(testNode)
                     }
                 ]);
                 break;
         }
     }
+
+    addSuite(testSuite) {
+        addTestSuiteModal.open(testSuite.id);
+    };
+
+    deleteSuite(testSuite) {
+        Modal.confirm({
+            title: "Do you want to delete this test suite?",
+            content: "All the test cases & test suites under this suite will also be deleted.",
+            okText: "Delete",
+            cancelText: "Cancel",
+            onOk: (close) => {
+                axios.delete("/api/suite/" + testSuite.id).then((response) => {
+                    message.success("The test suite is deleted successfully");
+                    close();
+                })
+            }
+        })
+    };
 
     viewCase(testCase) {
         event.emit("TabbedPanel.addPinnedPanel",
@@ -149,6 +168,10 @@ export default class TestTree extends Component {
         );
     }
 
+    addCase(testSuite) {
+        addTestCaseModal.open(testSuite.id);
+    };
+
     editCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
@@ -159,11 +182,18 @@ export default class TestTree extends Component {
         );
     }
 
-    addSuite(testSuite) {
-        addTestSuiteModal.open(testSuite.id);
-    };
-
-    addCase(testSuite) {
-        addTestCaseModal.open(testSuite.id);
-    };
+    deleteCase(testCase) {
+        Modal.confirm({
+            title: "Do you want to delete this test case?",
+            content: "All the related data will also be deleted.",
+            okText: "Delete",
+            cancelText: "Cancel",
+            onOk: (close) => {
+                axios.delete("/api/case/" + testCase.id).then((response) => {
+                    message.success("The test case is deleted successfully");
+                    close();
+                })
+            }
+        })
+    }
 }

@@ -31,6 +31,7 @@ class AddTestCaseModal extends Component {
             okText="Add"
             cancelText="Cancel"
             visible
+            maskClosable={false}
             confirmLoading={this.loading}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
