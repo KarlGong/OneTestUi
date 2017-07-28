@@ -10,7 +10,7 @@ import "./TabbedPanel.css";
 @observer
 export default class TabbedPanel extends Component {
     @observable panels = [];
-    @observable pinnedPanel = {name: <span><Icon type="file" />view</span>, key: "view", content: <div className="info">Select TestCase / TestSuite in left panel to view.</div>};
+    @observable pinnedPanel = {key: "view", content: <div className="info">Select TestCase / TestSuite in left panel to view.</div>};
     @observable activePanelKey = "view";
     disposers = [];
 
@@ -32,7 +32,7 @@ export default class TabbedPanel extends Component {
                     onChange={this.selectPanel.bind(this)}
                     onEdit={this.removePanel.bind(this)}
                 >
-                    <Tabs.TabPane tab={this.pinnedPanel.name} key={this.pinnedPanel.key} closable={false}>{this.pinnedPanel.content}</Tabs.TabPane>
+                    <Tabs.TabPane tab={<span><Icon type="eye-o" />&nbsp;</span>} key={this.pinnedPanel.key} closable={false}>{this.pinnedPanel.content}</Tabs.TabPane>
                     {this.panels.map(panel =>
                         <Tabs.TabPane tab={panel.name} key={panel.key}>{panel.content}</Tabs.TabPane>)}
                 </Tabs>

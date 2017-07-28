@@ -15,6 +15,10 @@ class TestCaseViewPanel extends Component {
     @observable testCase = {executionType: 0, importance: 1, testSteps: [], tags: []};
     @observable loading = false;
 
+    static defaultProps = {
+        testCaseId: null,
+    };
+
     componentDidMount = () => {
         this.loading = true;
         axios.get("/api/case/" + this.props.testCaseId).then((response) => {

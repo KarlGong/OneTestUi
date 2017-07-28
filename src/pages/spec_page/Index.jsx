@@ -12,7 +12,7 @@ class SpecPage extends Component {
                 <Layout.Sider width={200} style={{background: "#fff", borderRight: "1px #c0bdbd solid"}}>
                     <TestSpecTree/>
                 </Layout.Sider>
-                <Layout style={{ background: "#fff"}}>
+                <Layout style={{ background: "#fff", width: "calc(100% - 200px)"}}>
                     <TabbedPanel/>
                 </Layout>
             </Layout>

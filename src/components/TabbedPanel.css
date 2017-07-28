@@ -14,6 +14,10 @@
     margin-right: 3px;
 }
 
+.tabbed-panel .ant-tabs-nav > :nth-child(2) {
+    padding: 5px 0 4px 7px !important;
+}
+
 .tabbed-panel .ant-tabs-bar .ant-tabs-tab .anticon-close {
     opacity: 1 !important;
     font-size: 16px !important;

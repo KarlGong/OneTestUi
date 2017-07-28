@@ -7,11 +7,9 @@ import clipboard from "~/utils/clipboard";
 import axios from "axios";
 import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
-import TestCaseEditorPanel from "~/components/TestCaseEditorPanel";
-import TestCaseViewPanel from "~/components/TestCaseViewPanel";
+import TestCasePanel from "~/components/TestCasePanel";
 import addTestCaseModal from "~/utils/addTestCaseModal";
 import addTestSuiteModal from "~/utils/addTestSuiteModal";
-import "./TestSpecTree.css";
 
 @observer
 export default class TestSpecTree extends Component {
@@ -80,7 +78,7 @@ export default class TestSpecTree extends Component {
         this.selectedKeys = [e.node.props.eventKey];
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
-            this.viewCase(testNode);
+            this.pinCase(testNode);
         }
     }
 
@@ -124,10 +122,6 @@ export default class TestSpecTree extends Component {
                         onClick: () => this.viewCase(testNode)
                     },
                     {
-                        name: "Edit",
-                        onClick: () => this.editCase(testNode)
-                    },
-                    {
                         name: "Copy",
                         onClick: () => this.copyCase(testNode)
                     },
@@ -160,12 +154,22 @@ export default class TestSpecTree extends Component {
         })
     };
 
-    viewCase(testCase) {
+    pinCase(testCase) {
         event.emit("TabbedPanel.addPinnedPanel",
             {
-                key: "view-case-" + testCase.id,
+                key: "pinned-case-" + testCase.id,
                 name: <span><Icon type="file"/>{testCase.name}</span>,
-                content: <TestCaseViewPanel testCaseId={testCase.id}/>
+                content: <TestCasePanel testCaseId={testCase.id}/>
+            }
+        );
+    }
+
+    viewCase(testCase) {
+        event.emit("TabbedPanel.addPanel",
+            {
+                key: "case-" + testCase.id,
+                name: <span><Icon type="file"/>{testCase.name}</span>,
+                content: <TestCasePanel testCaseId={testCase.id}/>
             }
         );
     }
@@ -195,16 +199,6 @@ export default class TestSpecTree extends Component {
         }).then((response) => {
             message.success("Test case is pasted successfully");
         });
-    }
-
-    editCase(testCase) {
-        event.emit("TabbedPanel.addPanel",
-            {
-                key: "edit-case-" + testCase.id,
-                name: <span><Icon type="edit"/>{testCase.name}</span>,
-                content: <TestCaseEditorPanel mode="edit" testCaseId={testCase.id}/>
-            }
-        );
     }
 
     deleteCase(testCase) {
