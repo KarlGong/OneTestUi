@@ -1,0 +1,10 @@
+.test-case-tab {
+    position: relative;
+    height: 100%;
+}
+
+.test-case-tab .actions {
+    position: absolute;
+    right: 5px;
+    top: 15px;
+}

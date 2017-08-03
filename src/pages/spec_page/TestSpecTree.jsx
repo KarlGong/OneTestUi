@@ -7,7 +7,7 @@ import clipboard from "~/utils/clipboard";
 import axios from "axios";
 import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
-import TestCasePanel from "~/components/TestCasePanel";
+import TestCaseTab from "~/components/TestCaseTab";
 import addTestCaseModal from "~/utils/addTestCaseModal";
 import addTestSuiteModal from "~/utils/addTestSuiteModal";
 
@@ -93,10 +93,6 @@ export default class TestSpecTree extends Component {
                         onClick: () => console.log("open")
                     },
                     {
-                        name: "Edit",
-                        onClick: () => console.log("open")
-                    },
-                    {
                         name: "Add Test Suite",
                         onClick: () => this.addSuite(testNode)
                     },
@@ -118,7 +114,7 @@ export default class TestSpecTree extends Component {
             case "case":
                 contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
-                        name: "View",
+                        name: "Open",
                         onClick: () => this.viewCase(testNode)
                     },
                     {
@@ -159,7 +155,7 @@ export default class TestSpecTree extends Component {
             {
                 key: "pinned-case-" + testCase.id,
                 name: <span><Icon type="file"/>{testCase.name}</span>,
-                content: <TestCasePanel testCaseId={testCase.id}/>
+                content: <TestCaseTab testCaseId={testCase.id}/>
             }
         );
     }
@@ -169,7 +165,7 @@ export default class TestSpecTree extends Component {
             {
                 key: "case-" + testCase.id,
                 name: <span><Icon type="file"/>{testCase.name}</span>,
-                content: <TestCasePanel testCaseId={testCase.id}/>
+                content: <TestCaseTab testCaseId={testCase.id}/>
             }
         );
     }
