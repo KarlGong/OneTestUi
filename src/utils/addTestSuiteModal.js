@@ -11,8 +11,8 @@ import TestSuiteTab from "~/components/TestSuiteTab";
 const target = document.createElement("div");
 document.body.appendChild(target);
 
-function open(parentTestSuiteId) {
-    render(<AddTestSuiteModal parentTestSuiteId={parentTestSuiteId}/>, target);
+function open(parentTestSuiteId, onSuccess) {
+    render(<AddTestSuiteModal parentTestSuiteId={parentTestSuiteId} onSuccess={onSuccess} />, target);
 }
 
 function close() {
@@ -27,6 +27,7 @@ class AddTestSuiteModal extends Component {
 
     static defaultProps = {
         parentTestSuiteId: null,
+        onSuccess: (id, name) => {},
     };
 
     render = () => {
@@ -58,15 +59,8 @@ class AddTestSuiteModal extends Component {
             name: this.testSuiteName,
             description: this.testSuiteDescription
         }).then((response) => {
+            this.props.onSuccess(response.data, this.testSuiteName);
             this.loading = false;
-            message.success("Test suite is added successfully");
-            event.emit("TabbedPanel.addPanel",
-                {
-                    key: "suite-" + response.data,
-                    name: <span><Icon type="folder"/>{this.testSuiteName}</span>,
-                    content: <TestSuiteTab defaultMode="edit" testSuiteId={response.data}/>
-                }
-            );
             close();
         })
     };

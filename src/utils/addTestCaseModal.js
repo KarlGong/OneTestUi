@@ -10,8 +10,8 @@ import TestCaseTab from "~/components/TestCaseTab";
 const target = document.createElement("div");
 document.body.appendChild(target);
 
-function open(testSuiteId) {
-    render(<AddTestCaseModal testSuiteId={testSuiteId}/>, target);
+function open(testSuiteId, onSuccess) {
+    render(<AddTestCaseModal testSuiteId={testSuiteId} onSuccess={onSuccess}/>, target);
 }
 
 function close() {
@@ -25,6 +25,7 @@ class AddTestCaseModal extends Component {
 
     static defaultProps = {
         testSuiteId: null,
+        onSuccess: (id, name) => {}
     };
 
     render = () => {
@@ -52,15 +53,8 @@ class AddTestCaseModal extends Component {
             testSuiteId: this.props.testSuiteId,
             name: this.testCaseName
         }).then((response) => {
+            this.props.onSuccess(response.data, this.testCaseName);
             this.loading = false;
-            message.success("Test case is added successfully");
-            event.emit("TabbedPanel.addPanel",
-                {
-                    key: "case-" + response.data,
-                    name: <span><Icon type="file"/>{this.testCaseName}</span>,
-                    content: <TestCaseTab defaultMode="edit" testCaseId={response.data}/>
-                }
-            );
             close();
         })
     };

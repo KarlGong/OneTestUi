@@ -41,7 +41,7 @@ export default class TestSpecTree extends Component {
 
         return (
             <Spin spinning={this.loading}>
-                <div style={{height: "100%"}}>
+                <div style={{height: "100%", overflow: "auto"}}>
                     <Tree
                         className="test-spec-tree"
                         draggable
@@ -73,6 +73,10 @@ export default class TestSpecTree extends Component {
                 resolve();
             }
         })
+    }
+
+    refreshSuite(testSuite) {
+
     }
 
     handleSelect(selectedKeys, e) {
@@ -135,7 +139,16 @@ export default class TestSpecTree extends Component {
     }
 
     addSuite(testSuite) {
-        addTestSuiteModal.open(testSuite.id);
+        addTestSuiteModal.open(testSuite.id, (id, name)=> {
+            message.success("Test suite is added successfully");
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "suite-" + id,
+                    name: <span><Icon type="folder"/>{name}</span>,
+                    content: <TestSuiteTab defaultMode="edit" testSuiteId={id}/>
+                }
+            );
+        });
     };
 
     pinSuite(testSuite) {
@@ -194,7 +207,16 @@ export default class TestSpecTree extends Component {
     }
 
     addCase(testSuite) {
-        addTestCaseModal.open(testSuite.id);
+        addTestCaseModal.open(testSuite.id, (id, name) => {
+            message.success("Test case is added successfully");
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "case-" + id,
+                    name: <span><Icon type="file"/>{name}</span>,
+                    content: <TestCaseTab defaultMode="edit" testCaseId={id}/>
+                }
+            );
+        });
     };
 
     copyCase(testCase) {
