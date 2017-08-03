@@ -73,9 +73,6 @@ export default class TestCaseViewPanel extends Component {
                         <span>{this.testCase.tags.map((tag) => tag.value).join(", ")}</span>
                     </Form.Item>
                 </Form>
-                <div style={{borderTop: "1px #d9d9d9 solid", padding: "18px 0"}}>
-                    <Button type="primary" onClick={this.edit}>Edit</Button>
-                </div>
             </div>
         );
     };

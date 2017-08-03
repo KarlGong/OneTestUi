@@ -8,14 +8,15 @@ import "./TestCaseTab.css";
 
 @observer
 export default class TestCaseTab extends Component {
-    @observable mode = "view";
+    static defaultProps = {
+        testCaseId: null,
+        defaultMode: "view"
+    };
+
+    @observable mode = this.props.defaultMode;
     @observable loading = false;
     @observable saving = false;
     editPanel = null;
-
-    static defaultProps = {
-        testCaseId: null,
-    };
 
     render = () => {
         return (
@@ -29,9 +30,9 @@ export default class TestCaseTab extends Component {
                                            onSavingFinish={() => {this.saving = false; message.success("Test case is saved successfully");}}
                                            ref={instance => this.editPanel = instance}/>
                         <div className="actions">
-                            <Button style={{marginRight: "10px"}} icon="save" type="primary" onClick={this.save}
+                            <Button style={{marginRight: "10px"}} icon="save" type="primary" onClick={() => this.editPanel.save()}
                                     loading={this.saving}>Save</Button>
-                            <Button key="mode" icon="eye-o" type="default" onClick={this.toView}>Back to View</Button>
+                            <Button key="mode" icon="eye-o" type="default" onClick={() => this.mode = "view"}>Back to View</Button>
                         </div>
                     </div> :
                     <div>
@@ -39,23 +40,11 @@ export default class TestCaseTab extends Component {
                                            onLoadingStart={() => this.loading = true}
                                            onLoadingFinish={() => this.loading = false}/>
                         <div className="actions">
-                            <Button key="mode" icon="edit" type="default" onClick={this.toEdit}>Edit</Button>
+                            <Button key="mode" icon="edit" type="default" onClick={() => this.mode = "edit"}>Edit</Button>
                         </div>
                     </div>}
                 </div>
             </Spin>
         )
     };
-
-    toEdit = () => {
-        this.mode = "edit";
-    };
-
-    toView = () => {
-        this.mode = "view";
-    };
-
-    save = () => {
-        this.editPanel.save();
-    }
 }
