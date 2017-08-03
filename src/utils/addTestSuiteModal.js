@@ -2,9 +2,11 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, action, toJS, runInAction} from "mobx";
 import {render, unmountComponentAtNode} from "react-dom";
-import {Modal, Input, Form, message} from "antd";
+import {Modal, Input, Form, message, Icon} from "antd";
 import axios from "axios";
+import event from "~/utils/event";
 import RichTextEditor from "~/components/RichTextEditor";
+import TestSuiteTab from "~/components/TestSuiteTab";
 
 const target = document.createElement("div");
 document.body.appendChild(target);
@@ -58,6 +60,13 @@ class AddTestSuiteModal extends Component {
         }).then((response) => {
             this.loading = false;
             message.success("Test suite is added successfully");
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "suite-" + response.data,
+                    name: <span><Icon type="folder"/>{this.testSuiteName}</span>,
+                    content: <TestSuiteTab defaultMode="edit" testSuiteId={response.data}/>
+                }
+            );
             close();
         })
     };

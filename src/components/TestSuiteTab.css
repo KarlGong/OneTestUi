@@ -1,0 +1,10 @@
+.test-suite-tab {
+    position: relative;
+    height: 100%;
+}
+
+.test-suite-tab .actions {
+    position: absolute;
+    right: 5px;
+    top: 15px;
+}

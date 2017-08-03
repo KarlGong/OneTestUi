@@ -10,6 +10,7 @@ import contextMenu from "~/utils/contextMenu";
 import TestCaseTab from "~/components/TestCaseTab";
 import addTestCaseModal from "~/utils/addTestCaseModal";
 import addTestSuiteModal from "~/utils/addTestSuiteModal";
+import TestSuiteTab from "~/components/TestSuiteTab";
 
 @observer
 export default class TestSpecTree extends Component {
@@ -79,6 +80,8 @@ export default class TestSpecTree extends Component {
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
             this.pinCase(testNode);
+        } else if (testNode.type === "suite" || testNode.type === "rootSuite"){
+            this.pinSuite(testNode);
         }
     }
 
@@ -89,8 +92,8 @@ export default class TestSpecTree extends Component {
             case "suite":
                 contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
-                        name: "View",
-                        onClick: () => console.log("open")
+                        name: "Open",
+                        onClick: () => this.openSuite(testNode)
                     },
                     {
                         name: "Add Test Suite",
@@ -115,7 +118,7 @@ export default class TestSpecTree extends Component {
                 contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
                         name: "Open",
-                        onClick: () => this.viewCase(testNode)
+                        onClick: () => this.openCase(testNode)
                     },
                     {
                         name: "Copy",
@@ -134,6 +137,26 @@ export default class TestSpecTree extends Component {
     addSuite(testSuite) {
         addTestSuiteModal.open(testSuite.id);
     };
+
+    pinSuite(testSuite) {
+        event.emit("TabbedPanel.addPinnedPanel",
+            {
+                key: "pinned-suite-" + testSuite.id,
+                name: <span><Icon type="folder"/>{testSuite.name}</span>,
+                content: <TestSuiteTab testSuiteId={testSuite.id}/>
+            }
+        );
+    }
+
+    openSuite(testSuite) {
+        event.emit("TabbedPanel.addPanel",
+            {
+                key: "suite-" + testSuite.id,
+                name: <span><Icon type="folder"/>{testSuite.name}</span>,
+                content: <TestSuiteTab testSuiteId={testSuite.id}/>
+            }
+        );
+    }
 
     deleteSuite(testSuite) {
         Modal.confirm({
@@ -160,7 +183,7 @@ export default class TestSpecTree extends Component {
         );
     }
 
-    viewCase(testCase) {
+    openCase(testCase) {
         event.emit("TabbedPanel.addPanel",
             {
                 key: "case-" + testCase.id,

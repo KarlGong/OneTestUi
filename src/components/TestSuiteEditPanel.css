@@ -1,0 +1,12 @@
+.test-suite-editor .ant-form-item-label>label {
+    font-size: 13px;
+}
+
+.test-suite-editor .ant-row {
+    margin-bottom: 12px;
+}
+
+.test-suite-editor .rich-text-editor .editor {
+    height: 81px;
+    overflow: auto;
+}

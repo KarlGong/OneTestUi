@@ -2,8 +2,10 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, action, toJS, runInAction} from "mobx";
 import {render, unmountComponentAtNode} from "react-dom";
-import {Modal, Input, Form, message} from "antd";
+import {Modal, Input, Form, message, Icon} from "antd";
 import axios from "axios";
+import event from "~/utils/event";
+import TestCaseTab from "~/components/TestCaseTab";
 
 const target = document.createElement("div");
 document.body.appendChild(target);
@@ -52,6 +54,13 @@ class AddTestCaseModal extends Component {
         }).then((response) => {
             this.loading = false;
             message.success("Test case is added successfully");
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "case-" + response.data,
+                    name: <span><Icon type="file"/>{this.testCaseName}</span>,
+                    content: <TestCaseTab defaultMode="edit" testCaseId={response.data}/>
+                }
+            );
             close();
         })
     };
