@@ -32,7 +32,7 @@ export default class TestSuiteTab extends Component {
                         <div className="actions">
                             <Button style={{marginRight: "10px"}} icon="save" type="primary" onClick={() => this.editPanel.save()}
                                     loading={this.saving}>Save</Button>
-                            <Button key="mode" icon="eye-o" type="default" onClick={() => this.mode = "view"}>Back to View</Button>
+                            <Button key="mode" icon="rollback" type="default" onClick={() => this.mode = "view"}>Back to View</Button>
                         </div>
                     </div> :
                     <div>

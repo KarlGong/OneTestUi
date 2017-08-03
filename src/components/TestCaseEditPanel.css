@@ -6,11 +6,6 @@
     margin-bottom: 12px;
 }
 
-.test-case-editor .rich-text-editor .editor {
-    height: 81px;
-    overflow: auto;
-}
-
 .test-case-editor .spliter-wrapper {
     width: 100%;
     padding: 10px 0;

@@ -168,6 +168,7 @@ class RichTextEditor extends Component {
     static defaultProps = {
         defaultValue: "<p></p>",
         viewMode: false,
+        multiLine: true,
         onChange: (value) => {}
     };
 
@@ -551,7 +552,7 @@ class RichTextEditor extends Component {
     renderEditor = () => {
         return (
             <Editor
-                className="editor"
+                className={cs("editor", {"multi-line": !this.props.viewMode && this.props.multiLine})}
                 spellCheck
                 readOnly={this.props.viewMode}
                 schema={schema}

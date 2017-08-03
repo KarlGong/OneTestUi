@@ -5,8 +5,3 @@
 .test-suite-editor .ant-row {
     margin-bottom: 12px;
 }
-
-.test-suite-editor .rich-text-editor .editor {
-    height: 81px;
-    overflow: auto;
-}
