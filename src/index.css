@@ -34,6 +34,10 @@
 }
 
 .ant-tree .ant-tree-node-content-wrapper {
+    min-width: 30px;
+}
+
+.ant-tree .ant-tree-node-content-wrapper {
     padding: 0 !important;
 }
 

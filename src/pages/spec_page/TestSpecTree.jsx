@@ -66,9 +66,51 @@ export default class TestSpecTree extends Component {
         if (testNode.type !== "case") {
             this.loadChildren(testNode);
         }
+
     };
 
     onDrop = (info) => {
+        let dragTestNode = info.dragNode.props.data;
+        let targetTestNode = info.node.props.data;
+
+        if (targetTestNode.type === "case" && targetTestNode.order === info.dropPosition) {
+            return message.error("Cannot move test case into another test case.");
+        }
+
+        if (dragTestNode.type === "case") {
+            if (info.dropToGap) { // drop to gap
+                axios.post("/api/case/" + dragTestNode.id + "/move", {
+                    testSuiteId: targetTestNode.parent.id,
+                    position: Math.max(targetTestNode.order, info.dropPosition)
+                }).then((response) => {
+                    if (dragTestNode.parent.id === targetTestNode.parent.id) {
+                        this.loadChildren(dragTestNode.parent);
+                    } else {
+                        if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
+                            this.loadChildren(dragTestNode.parent).then(() => this.loadChildren(targetTestNode.parent));
+                        } else {
+                            this.loadChildren(targetTestNode.parent).then(() => this.loadChildren(dragTestNode.parent));
+                        }
+                    }
+                });
+            } else { // drop to test suite
+                if (dragTestNode.parent.id === targetTestNode.id) {
+                    return message.error("Cannot move test case into it's parent test suite.")
+                }
+
+                axios.post("/api/case/" + dragTestNode.id + "/move", {
+                    testSuiteId: targetTestNode.id,
+                    position: -1
+                }).then((response) => {
+                    if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
+                        this.loadChildren(dragTestNode.parent).then(() => this.loadChildren(targetTestNode));
+                    } else {
+                        this.loadChildren(targetTestNode).then(() => this.loadChildren(dragTestNode.parent));
+                    }
+                });
+            }
+        }
+
 
     };
 
@@ -155,13 +197,13 @@ export default class TestSpecTree extends Component {
     };
 
     addSuite = (testSuite) => {
-        addTestSuiteModal.open(testSuite.id, (id, name) => {
+        addTestSuiteModal.open(testSuite.id, (ts) => {
             message.success("Test suite is added successfully");
             event.emit("TabbedPanel.addPanel",
                 {
-                    key: "suite-" + id,
-                    name: <span><Icon type="folder"/>{name}</span>,
-                    content: <TestSuiteTab defaultMode="edit" testSuiteId={id}/>
+                    key: "suite-" + ts.id,
+                    name: <span><Icon type="folder"/>{ts.name}</span>,
+                    content: <TestSuiteTab defaultMode="edit" testSuiteId={ts.id}/>
                 }
             );
             this.loadChildren(testSuite);
@@ -197,8 +239,8 @@ export default class TestSpecTree extends Component {
             onOk: (close) => {
                 axios.delete("/api/suite/" + testSuite.id).then((response) => {
                     message.success("The test suite is deleted successfully");
-                    this.loadChildren(testSuite.parent);
                     close();
+                    this.loadChildren(testSuite.parent);
                 })
             }
         })
@@ -225,13 +267,13 @@ export default class TestSpecTree extends Component {
     };
 
     addCase = (testSuite) => {
-        addTestCaseModal.open(testSuite.id, (id, name) => {
+        addTestCaseModal.open(testSuite.id, (tc) => {
             message.success("Test case is added successfully");
             event.emit("TabbedPanel.addPanel",
                 {
-                    key: "case-" + id,
-                    name: <span><Icon type="file"/>{name}</span>,
-                    content: <TestCaseTab defaultMode="edit" testCaseId={id}/>
+                    key: "case-" + tc.id,
+                    name: <span><Icon type="file"/>{tc.name}</span>,
+                    content: <TestCaseTab defaultMode="edit" testCaseId={tc.id}/>
                 }
             );
             this.loadChildren(testSuite);
@@ -298,8 +340,8 @@ export default class TestSpecTree extends Component {
             onOk: (close) => {
                 axios.delete("/api/case/" + testCase.id).then((response) => {
                     message.success("The test case is deleted successfully");
-                    this.loadChildren(testCase.parent);
                     close();
+                    this.loadChildren(testCase.parent);
                 })
             }
         })

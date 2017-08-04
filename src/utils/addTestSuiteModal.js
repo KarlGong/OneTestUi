@@ -59,7 +59,7 @@ class AddTestSuiteModal extends Component {
             name: this.testSuiteName,
             description: this.testSuiteDescription
         }).then((response) => {
-            this.props.onSuccess(response.data, this.testSuiteName);
+            this.props.onSuccess(response.data);
             this.loading = false;
             close();
         })

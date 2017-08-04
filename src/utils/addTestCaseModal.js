@@ -53,7 +53,7 @@ class AddTestCaseModal extends Component {
             testSuiteId: this.props.testSuiteId,
             name: this.testCaseName
         }).then((response) => {
-            this.props.onSuccess(response.data, this.testCaseName);
+            this.props.onSuccess(response.data);
             this.loading = false;
             close();
         })
