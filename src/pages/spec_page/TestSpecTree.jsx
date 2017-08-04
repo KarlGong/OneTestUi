@@ -16,7 +16,6 @@ import TestSuiteTab from "~/components/TestSuiteTab";
 export default class TestSpecTree extends Component {
     @observable testSuites = [];
     @observable loading = false;
-    @observable selectedKeys = [];
 
     componentDidMount = () => {
         this.loading = true;
@@ -47,10 +46,10 @@ export default class TestSpecTree extends Component {
                         draggable
                         showLine
                         showicon
-                        selectedKeys={toJS(this.selectedKeys)}
                         loadData={(treeNode) => this.loadChildren(treeNode.props.data)}
                         onRightClick={this.handleRightClick}
                         onDragEnter={this.onDragEnter}
+                        onDragOver={this.onDragOver}
                         onDrop={this.onDrop}
                         onSelect={this.handleSelect}
                     >
@@ -66,16 +65,18 @@ export default class TestSpecTree extends Component {
         if (testNode.type !== "case") {
             this.loadChildren(testNode);
         }
+    };
 
+    onDragOver = (info) => {
+        if ((info.node.props.data.type === "case" && info.node.props.dragOver)
+            || (info.node.props.data.type === "rootSuite" && !info.node.props.dragOver)) {
+            info.event.dataTransfer.dropEffect = "none";
+        }
     };
 
     onDrop = (info) => {
         let dragTestNode = info.dragNode.props.data;
         let targetTestNode = info.node.props.data;
-
-        if (targetTestNode.type === "case" && targetTestNode.order === info.dropPosition) {
-            return message.error("Cannot move test case into another test case.");
-        }
 
         if (dragTestNode.type === "case") {
             if (info.dropToGap) { // drop to gap
@@ -94,10 +95,6 @@ export default class TestSpecTree extends Component {
                     }
                 });
             } else { // drop to test suite
-                if (dragTestNode.parent.id === targetTestNode.id) {
-                    return message.error("Cannot move test case into it's parent test suite.")
-                }
-
                 axios.post("/api/case/" + dragTestNode.id + "/move", {
                     testSuiteId: targetTestNode.id,
                     position: -1
@@ -134,7 +131,6 @@ export default class TestSpecTree extends Component {
     };
 
     handleSelect = (selectedKeys, e) => {
-        this.selectedKeys = [e.node.props.eventKey];
         let testNode = e.node.props.data;
         if (testNode.type === "case") {
             this.pinCase(testNode);
