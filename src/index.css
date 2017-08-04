@@ -22,6 +22,7 @@
 .ant-tree .ant-tree-center_open:after {
     content: "\E699" !important;
     font-size: 13px !important;
+    color: #e6c841;
 }
 
 .ant-tree .ant-tree-bottom_close:after,
@@ -29,8 +30,8 @@
 .ant-tree .ant-tree-center_close:after {
     content: "\E662" !important;
     font-size: 13px !important;
+    color: #e6c841;
 }
-
 
 .ant-tree .ant-tree-node-content-wrapper {
     padding: 0 !important;

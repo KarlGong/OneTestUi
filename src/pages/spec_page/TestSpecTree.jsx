@@ -28,12 +28,6 @@ export default class TestSpecTree extends Component {
         })
     };
 
-    getParentSuiteId = (testNode) => {
-        axios.get("/api/" + testNode.type + "/" + testNode.id + "/parent").then((response) => {
-
-        })
-    };
-
     render = () => {
         const loop = (data) => data.map((item) => {
             let key = item.type + "-" + item.id;
@@ -67,6 +61,17 @@ export default class TestSpecTree extends Component {
         );
     };
 
+    onDragEnter = (info) => {
+        let testNode = info.node.props.data;
+        if (testNode.type !== "case") {
+            this.loadChildren(testNode);
+        }
+    };
+
+    onDrop = (info) => {
+
+    };
+
     loadChildren = (testSuite) => {
         return axios.get("/api/suite/" + testSuite.id + "/children").then(function (response) {
             if (testSuite.children.length) {
@@ -82,6 +87,7 @@ export default class TestSpecTree extends Component {
             } else {
                 testSuite.children = response.data;
             }
+            testSuite.children.map((child) => child.parent = testSuite);
         });
     };
 
@@ -158,7 +164,7 @@ export default class TestSpecTree extends Component {
                     content: <TestSuiteTab defaultMode="edit" testSuiteId={id}/>
                 }
             );
-            this.refreshChildren(testSuite);
+            this.loadChildren(testSuite);
         });
     };
 
@@ -191,6 +197,7 @@ export default class TestSpecTree extends Component {
             onOk: (close) => {
                 axios.delete("/api/suite/" + testSuite.id).then((response) => {
                     message.success("The test suite is deleted successfully");
+                    this.loadChildren(testSuite.parent);
                     close();
                 })
             }
@@ -227,7 +234,7 @@ export default class TestSpecTree extends Component {
                     content: <TestCaseTab defaultMode="edit" testCaseId={id}/>
                 }
             );
-            this.refreshChildren(testSuite);
+            this.loadChildren(testSuite);
         });
     };
 
@@ -251,19 +258,34 @@ export default class TestSpecTree extends Component {
                 }));
         }).then((response) => {
             message.success("Test case is pasted successfully");
+            this.loadChildren(testSuite);
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "case-" + response.data.id,
+                    name: <span><Icon type="file"/>{response.data.name}</span>,
+                    content: <TestCaseTab defaultMode="edit" testCaseId={response.data.id}/>
+                }
+            );
         });
     };
 
     duplicateCase = (testCase) => {
         axios.get("/api/case/" + testCase.id).then((response) => {
-            let testCase = response.data;
             return axios.put("/api/case",
-                Object.assign({}, testCase, {
-                    testSuiteId: testSuite.id,
+                Object.assign({}, response.data, {
+                    testSuiteId: testCase.parent.id,
                     name: testCase.name + "-copy"
                 }));
         }).then((response) => {
             message.success("Test case is duplicated successfully");
+            this.loadChildren(testCase.parent);
+            event.emit("TabbedPanel.addPanel",
+                {
+                    key: "case-" + response.data.id,
+                    name: <span><Icon type="file"/>{response.data.name}</span>,
+                    content: <TestCaseTab defaultMode="edit" testCaseId={response.data.id}/>
+                }
+            );
         });
     };
 
@@ -276,6 +298,7 @@ export default class TestSpecTree extends Component {
             onOk: (close) => {
                 axios.delete("/api/case/" + testCase.id).then((response) => {
                     message.success("The test case is deleted successfully");
+                    this.loadChildren(testCase.parent);
                     close();
                 })
             }
