@@ -2,8 +2,8 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable, toJS, untracked, runInAction, action} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
-import TestSuiteViewPanel from "~/components/TestSuiteViewPanel";
-import TestSuiteEditPanel from "~/components/TestSuiteEditPanel";
+import TestSuiteViewPanel from "./TestSuiteViewPanel";
+import TestSuiteEditPanel from "./TestSuiteEditPanel";
 import "./TestSuiteTab.css";
 
 @observer

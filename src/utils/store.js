@@ -1,11 +1,11 @@
 
 export const executionMap = {
-    0: "Manual",
-    1: "Automated"
+    "manual": "Manual",
+    "automated": "Automated"
 };
 
 export const importanceMap = {
-    0: "High",
-    1: "Medium",
-    2: "Low"
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
 };

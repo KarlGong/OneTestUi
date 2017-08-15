@@ -11,7 +11,7 @@ import "./TestCaseEditPanel.css";
 
 @observer
 export default class TestCaseEditPanel extends Component {
-    @observable testCase = {executionType: "0", importance: "1", testSteps: [], tags: []};
+    @observable testCase = {executionType: "manual", importance: "medium", testSteps: [], tags: []};
     @observable loading = false;
     @observable possibleTags = [];
 
@@ -106,14 +106,14 @@ export default class TestCaseEditPanel extends Component {
                                      defaultValue={this.testCase.executionType}
                                      onChange={(e) => this.testCase.executionType = e.target.value}>
                             {Object.keys(executionMap).map((k) =>
-                                <Radio.Button key={k} value={k.toString()}>{executionMap[k]}</Radio.Button>)}
+                                <Radio.Button key={k} value={k}>{executionMap[k]}</Radio.Button>)}
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item label="Importance">
                         <Select key={this.loading} size="default" defaultValue={this.testCase.importance}
                                 style={{width: "100px"}} onChange={(value) => this.testCase.importance = value}>
                             {Object.keys(importanceMap).map((k) =>
-                                <Select.Option key={k} value={k.toString()}>{importanceMap[k]}</Select.Option>)}
+                                <Select.Option key={k} value={k}>{importanceMap[k]}</Select.Option>)}
                         </Select>
                     </Form.Item>
                     <Form.Item label="Tags">

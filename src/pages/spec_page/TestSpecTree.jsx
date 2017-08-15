@@ -7,21 +7,22 @@ import clipboard from "~/utils/clipboard";
 import axios from "axios";
 import event from "~/utils/event";
 import contextMenu from "~/utils/contextMenu";
-import TestCaseTab from "~/components/TestCaseTab";
+import TestCaseTab from "~/components/testcase/TestCaseTab";
+import TestSuiteTab from "~/components/testsuite/TestSuiteTab";
+import TestProjectTab from "~/components/testproject/TestProjectTab";
 import addTestCaseModal from "~/utils/addTestCaseModal";
 import addTestSuiteModal from "~/utils/addTestSuiteModal";
-import TestSuiteTab from "~/components/TestSuiteTab";
 
 @observer
 export default class TestSpecTree extends Component {
-    @observable testSuites = [];
+    @observable testProjects = [];
     @observable loading = false;
 
     componentDidMount = () => {
         this.loading = true;
-        axios.get("/api/project/1/rootsuite").then((response) => {
+        axios.get("/api/node/1").then((response) => {
             runInAction(() => {
-                this.testSuites.push(response.data);
+                this.testProjects.push(response.data);
                 this.loading = false;
             });
         })
@@ -29,11 +30,10 @@ export default class TestSpecTree extends Component {
 
     render = () => {
         const loop = (data) => data.map((item) => {
-            let key = item.type + "-" + item.id;
             if (item.type === "case") { // test case
-                return <Tree.TreeNode data={item} key={key} title={item.name} isLeaf/>;
-            } else { // test suite
-                return <Tree.TreeNode data={item} key={key}
+                return <Tree.TreeNode data={item} key={item.id} title={item.name} isLeaf/>;
+            } else { // test project and test suite
+                return <Tree.TreeNode data={item} key={item.id}
                                       title={item.name}>{loop(item.children)}</Tree.TreeNode>;
             }
         });
@@ -53,7 +53,7 @@ export default class TestSpecTree extends Component {
                         onDrop={this.onDrop}
                         onSelect={this.handleSelect}
                     >
-                        {loop(this.testSuites)}
+                        {loop(this.testProjects)}
                     </Tree>
                 </div>
             </Spin>
@@ -69,7 +69,7 @@ export default class TestSpecTree extends Component {
 
     onDragOver = (info) => {
         if ((info.node.props.data.type === "case" && info.node.props.dragOver)
-            || (info.node.props.data.type === "rootSuite" && !info.node.props.dragOver)) {
+            || (info.node.props.data.type === "project" && !info.node.props.dragOver)) {
             info.event.dataTransfer.dropEffect = "none";
         }
     };
@@ -81,7 +81,7 @@ export default class TestSpecTree extends Component {
         if (dragTestNode.type === "case") {
             if (info.dropToGap) { // drop to gap
                 axios.post("/api/case/" + dragTestNode.id + "/move", {
-                    testSuiteId: targetTestNode.parent.id,
+                    testProjectId: targetTestNode.parent.id,
                     position: Math.max(targetTestNode.order, info.dropPosition)
                 }).then((response) => {
                     if (dragTestNode.parent.id === targetTestNode.parent.id) {
@@ -96,7 +96,7 @@ export default class TestSpecTree extends Component {
                 });
             } else { // drop to test suite
                 axios.post("/api/case/" + dragTestNode.id + "/move", {
-                    testSuiteId: targetTestNode.id,
+                    testProjectId: targetTestNode.id,
                     position: -1
                 }).then((response) => {
                     if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
@@ -111,38 +111,57 @@ export default class TestSpecTree extends Component {
 
     };
 
-    loadChildren = (testSuite) => {
-        return axios.get("/api/suite/" + testSuite.id + "/children").then(function (response) {
-            if (testSuite.children.length) {
+    loadChildren = (testNode) => {
+        return axios.get("/api/node/" + testNode.id + "/children").then(function (response) {
+            if (testNode.children.length) {
                 response.data.map((testNode) => {
                     if (testNode.type !== "case") {
-                        let loadedChildTestSuites = testSuite.children.filter((node) => node.id === testNode.id && node.type === testNode.type);
+                        let loadedChildTestSuites = testNode.children.filter((node) => node.id === testNode.id && node.type === testNode.type);
                         if (loadedChildTestSuites.length) {
                             testNode.children = loadedChildTestSuites[0].children;
                         }
                     }
                 });
-                testSuite.children = response.data;
+                testNode.children = response.data;
             } else {
-                testSuite.children = response.data;
+                testNode.children = response.data;
             }
-            testSuite.children.map((child) => child.parent = testSuite);
+            testNode.children.map((child) => child.parent = testNode);
         });
     };
 
     handleSelect = (selectedKeys, e) => {
         let testNode = e.node.props.data;
-        if (testNode.type === "case") {
-            this.pinCase(testNode);
-        } else {
-            this.pinSuite(testNode);
+        switch (testNode.type) {
+            case "project": this.pinProject(testNode);break;
+            case "suite": this.pinSuite(testNode);break;
+            case "case": this.pinCase(testNode);break;
         }
     };
 
     handleRightClick = (e) => {
         let testNode = e.node.props.data;
         switch (testNode.type) {
-            case "rootSuite":
+            case "project":
+                contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
+                    {
+                        name: "Open",
+                        onClick: () => this.openProject(testNode)
+                    },
+                    {
+                        name: "Add Test Suite",
+                        onClick: () => this.addSuite(testNode)
+                    },
+                    {
+                        name: "Add Test Case",
+                        onClick: () => this.addCase(testNode)
+                    },
+                    {
+                        name: "Paste Test Case",
+                        onClick: () => this.pasteCase(testNode)
+                    }
+                ]);
+                break;
             case "suite":
                 contextMenu.open(e.event.nativeEvent.pageX, e.event.nativeEvent.pageY, [
                     {
@@ -192,8 +211,28 @@ export default class TestSpecTree extends Component {
         }
     };
 
-    addSuite = (testSuite) => {
-        addTestSuiteModal.open(testSuite.id, (ts) => {
+    pinProject = (testProject) => {
+        event.emit("TabbedPanel.addPinnedPanel",
+            {
+                key: "pinned-project-" + testProject.id,
+                name: <span><Icon type="folder"/>{testProject.name}</span>,
+                content: <TestProjectTab testProjectId={testProject.id}/>
+            }
+        );
+    };
+
+    openProject = (testProject) => {
+        event.emit("TabbedPanel.addPanel",
+            {
+                key: "project-" + testProject.id,
+                name: <span><Icon type="folder"/>{testProject.name}</span>,
+                content: <TestProjectTab testProjectId={testProject.id}/>
+            }
+        );
+    };
+
+    addSuite = (testNode) => {
+        addTestSuiteModal.open(testNode.id, (ts) => {
             message.success("Test suite is added successfully");
             event.emit("TabbedPanel.addPanel",
                 {
@@ -202,7 +241,7 @@ export default class TestSpecTree extends Component {
                     content: <TestSuiteTab defaultMode="edit" testSuiteId={ts.id}/>
                 }
             );
-            this.loadChildren(testSuite);
+            this.loadChildren(testNode);
         });
     };
 
@@ -262,8 +301,8 @@ export default class TestSpecTree extends Component {
         );
     };
 
-    addCase = (testSuite) => {
-        addTestCaseModal.open(testSuite.id, (tc) => {
+    addCase = (testNode) => {
+        addTestCaseModal.open(testNode.id, (tc) => {
             message.success("Test case is added successfully");
             event.emit("TabbedPanel.addPanel",
                 {
@@ -272,7 +311,7 @@ export default class TestSpecTree extends Component {
                     content: <TestCaseTab defaultMode="edit" testCaseId={tc.id}/>
                 }
             );
-            this.loadChildren(testSuite);
+            this.loadChildren(testNode);
         });
     };
 
@@ -289,11 +328,10 @@ export default class TestSpecTree extends Component {
         }
         axios.get("/api/case/" + testCaseId).then((response) => {
             let testCase = response.data;
-            return axios.put("/api/case",
-                Object.assign({}, testCase, {
-                    testSuiteId: testSuite.id,
-                    name: testCase.name + "-copy"
-                }));
+            testCase.name = testCase.name + "-copy";
+            testCase.parentId = testSuite.id;
+            testCase.position = -1;
+            return axios.put("/api/case", testCase);
         }).then((response) => {
             message.success("Test case is pasted successfully");
             this.loadChildren(testSuite);
@@ -309,11 +347,10 @@ export default class TestSpecTree extends Component {
 
     duplicateCase = (testCase) => {
         axios.get("/api/case/" + testCase.id).then((response) => {
-            return axios.put("/api/case",
-                Object.assign({}, response.data, {
-                    testSuiteId: testCase.parent.id,
-                    name: testCase.name + "-copy"
-                }));
+            let testCase = response.data;
+            testCase.name = testCase.name + "-copy";
+            testCase.position++;
+            return axios.put("/api/case", testCase);
         }).then((response) => {
             message.success("Test case is duplicated successfully");
             this.loadChildren(testCase.parent);

@@ -11,7 +11,7 @@ import "./TestCaseViewPanel.css";
 
 @observer
 export default class TestCaseViewPanel extends Component {
-    @observable testCase = {executionType: 0, importance: 1, testSteps: [], tags: []};
+    @observable testCase = {executionType: "manual", importance: "medium", testSteps: [], tags: []};
     @observable loading = false;
 
     static defaultProps = {

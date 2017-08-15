@@ -5,13 +5,12 @@ import {render, unmountComponentAtNode} from "react-dom";
 import {Modal, Input, Form, message, Icon} from "antd";
 import axios from "axios";
 import event from "~/utils/event";
-import TestCaseTab from "~/components/TestCaseTab";
 
 const target = document.createElement("div");
 document.body.appendChild(target);
 
-function open(testSuiteId, onSuccess) {
-    render(<AddTestCaseModal testSuiteId={testSuiteId} onSuccess={onSuccess}/>, target);
+function open(parentId, onSuccess) {
+    render(<AddTestCaseModal parentId={parentId} onSuccess={onSuccess}/>, target);
 }
 
 function close() {
@@ -24,7 +23,7 @@ class AddTestCaseModal extends Component {
     testCaseName = null;
 
     static defaultProps = {
-        testSuiteId: null,
+        parentId: null,
         onSuccess: (id, name) => {}
     };
 
@@ -50,8 +49,9 @@ class AddTestCaseModal extends Component {
     handleOk = () => {
         this.loading = true;
         axios.put("/api/case", {
-            testSuiteId: this.props.testSuiteId,
-            name: this.testCaseName
+            parentId: this.props.parentId,
+            name: this.testCaseName,
+            position: -1
         }).then((response) => {
             this.props.onSuccess(response.data);
             this.loading = false;

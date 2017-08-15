@@ -6,13 +6,12 @@ import {Modal, Input, Form, message, Icon} from "antd";
 import axios from "axios";
 import event from "~/utils/event";
 import RichTextEditor from "~/components/RichTextEditor";
-import TestSuiteTab from "~/components/TestSuiteTab";
 
 const target = document.createElement("div");
 document.body.appendChild(target);
 
-function open(parentTestSuiteId, onSuccess) {
-    render(<AddTestSuiteModal parentTestSuiteId={parentTestSuiteId} onSuccess={onSuccess} />, target);
+function open(parentId, onSuccess) {
+    render(<AddTestSuiteModal parentId={parentId} onSuccess={onSuccess} />, target);
 }
 
 function close() {
@@ -26,7 +25,7 @@ class AddTestSuiteModal extends Component {
     testSuiteDescription = null;
 
     static defaultProps = {
-        parentTestSuiteId: null,
+        parentId: null,
         onSuccess: (id, name) => {},
     };
 
@@ -55,9 +54,10 @@ class AddTestSuiteModal extends Component {
     handleOk = () => {
         this.loading = true;
         axios.put("/api/suite", {
-            ParentSuiteId: this.props.parentTestSuiteId,
+            parentId: this.props.parentId,
             name: this.testSuiteName,
-            description: this.testSuiteDescription
+            description: this.testSuiteDescription,
+            position: -1
         }).then((response) => {
             this.props.onSuccess(response.data);
             this.loading = false;

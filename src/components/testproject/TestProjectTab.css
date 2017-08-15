@@ -1,0 +1,10 @@
+.test-project-tab {
+    position: relative;
+    height: 100%;
+}
+
+.test-project-tab .actions {
+    position: absolute;
+    right: 5px;
+    top: 15px;
+}
