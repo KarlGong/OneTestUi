@@ -17,6 +17,7 @@ import addTestSuiteModal from "~/utils/addTestSuiteModal";
 export default class TestSpecTree extends Component {
     @observable testProjects = [];
     @observable loading = false;
+    dragNode = null;
 
     componentDidMount = () => {
         this.loading = true;
@@ -48,9 +49,11 @@ export default class TestSpecTree extends Component {
                         showicon
                         loadData={(treeNode) => this.loadChildren(treeNode.props.data)}
                         onRightClick={this.handleRightClick}
+                        onDragStart={this.onDragStart}
                         onDragEnter={this.onDragEnter}
                         onDragOver={this.onDragOver}
                         onDrop={this.onDrop}
+                        onDragEnd={this.onDragEnd}
                         onSelect={this.handleSelect}
                     >
                         {loop(this.testProjects)}
@@ -60,9 +63,18 @@ export default class TestSpecTree extends Component {
         );
     };
 
+    onDragStart = (info) => {
+        this.dragNode = info.node;
+        let testNode = info.node.props.data;
+        testNode.children = [];
+        if (testNode.type === "project") {
+            info.event.dataTransfer.effectAllowed = "none";
+        }
+    };
+
     onDragEnter = (info) => {
         let testNode = info.node.props.data;
-        if (testNode.type !== "case") {
+        if (testNode.type !== "case" && this.dragNode.props.data.id !== info.node.props.data.id) {
             this.loadChildren(testNode);
         }
     };
@@ -78,11 +90,11 @@ export default class TestSpecTree extends Component {
         let dragTestNode = info.dragNode.props.data;
         let targetTestNode = info.node.props.data;
 
-        if (dragTestNode.type === "case") {
+        if (dragTestNode.type !== "project") {
             if (info.dropToGap) { // drop to gap
-                axios.post("/api/case/" + dragTestNode.id + "/move", {
-                    testProjectId: targetTestNode.parent.id,
-                    position: Math.max(targetTestNode.order, info.dropPosition)
+                axios.post("/api/node/" + dragTestNode.id + "/move", {
+                    toParentId: targetTestNode.parentId,
+                    toPosition: Math.max(targetTestNode.position, info.dropPosition)
                 }).then((response) => {
                     if (dragTestNode.parent.id === targetTestNode.parent.id) {
                         this.loadChildren(dragTestNode.parent);
@@ -95,9 +107,9 @@ export default class TestSpecTree extends Component {
                     }
                 });
             } else { // drop to test suite
-                axios.post("/api/case/" + dragTestNode.id + "/move", {
-                    testProjectId: targetTestNode.id,
-                    position: -1
+                axios.post("/api/node/" + dragTestNode.id + "/move", {
+                    toParentId: targetTestNode.id,
+                    toPosition: -1
                 }).then((response) => {
                     if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
                         this.loadChildren(dragTestNode.parent).then(() => this.loadChildren(targetTestNode));
@@ -111,14 +123,18 @@ export default class TestSpecTree extends Component {
 
     };
 
+    onDragEnd = () => {
+        this.dragNode = null;
+    };
+
     loadChildren = (testNode) => {
         return axios.get("/api/node/" + testNode.id + "/children").then(function (response) {
             if (testNode.children.length) {
-                response.data.map((testNode) => {
-                    if (testNode.type !== "case") {
-                        let loadedChildTestSuites = testNode.children.filter((node) => node.id === testNode.id && node.type === testNode.type);
+                response.data.map((responseTestNode) => {
+                    if (responseTestNode.type !== "case") {
+                        let loadedChildTestSuites = testNode.children.filter((node) => node.id === responseTestNode.id && node.type === responseTestNode.type);
                         if (loadedChildTestSuites.length) {
-                            testNode.children = loadedChildTestSuites[0].children;
+                            responseTestNode.children = loadedChildTestSuites[0].children;
                         }
                     }
                 });
