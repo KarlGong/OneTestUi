@@ -119,8 +119,6 @@ export default class TestSpecTree extends Component {
                 });
             }
         }
-
-
     };
 
     onDragEnd = () => {
@@ -231,7 +229,7 @@ export default class TestSpecTree extends Component {
         event.emit("TabbedPanel.addPinnedPanel",
             {
                 key: "pinned-project-" + testProject.id,
-                name: <span><Icon type="folder"/>{testProject.name}</span>,
+                name: <span><Icon type="project"/>{testProject.name}</span>,
                 content: <TestProjectTab testProjectId={testProject.id}/>
             }
         );
@@ -241,7 +239,7 @@ export default class TestSpecTree extends Component {
         event.emit("TabbedPanel.addPanel",
             {
                 key: "project-" + testProject.id,
-                name: <span><Icon type="folder"/>{testProject.name}</span>,
+                name: <span><Icon type="project"/>{testProject.name}</span>,
                 content: <TestProjectTab testProjectId={testProject.id}/>
             }
         );
@@ -301,7 +299,7 @@ export default class TestSpecTree extends Component {
         event.emit("TabbedPanel.addPinnedPanel",
             {
                 key: "pinned-case-" + testCase.id,
-                name: <span><Icon type="file"/>{testCase.name}</span>,
+                name: <span><Icon type="case"/>{testCase.name}</span>,
                 content: <TestCaseTab testCaseId={testCase.id}/>
             }
         );
@@ -311,7 +309,7 @@ export default class TestSpecTree extends Component {
         event.emit("TabbedPanel.addPanel",
             {
                 key: "case-" + testCase.id,
-                name: <span><Icon type="file"/>{testCase.name}</span>,
+                name: <span><Icon type="case"/>{testCase.name}</span>,
                 content: <TestCaseTab testCaseId={testCase.id}/>
             }
         );
@@ -323,7 +321,7 @@ export default class TestSpecTree extends Component {
             event.emit("TabbedPanel.addPanel",
                 {
                     key: "case-" + tc.id,
-                    name: <span><Icon type="file"/>{tc.name}</span>,
+                    name: <span><Icon type="case"/>{tc.name}</span>,
                     content: <TestCaseTab defaultMode="edit" testCaseId={tc.id}/>
                 }
             );
@@ -354,7 +352,7 @@ export default class TestSpecTree extends Component {
             event.emit("TabbedPanel.addPanel",
                 {
                     key: "case-" + response.data.id,
-                    name: <span><Icon type="file"/>{response.data.name}</span>,
+                    name: <span><Icon type="case"/>{response.data.name}</span>,
                     content: <TestCaseTab defaultMode="edit" testCaseId={response.data.id}/>
                 }
             );
@@ -373,7 +371,7 @@ export default class TestSpecTree extends Component {
             event.emit("TabbedPanel.addPanel",
                 {
                     key: "case-" + response.data.id,
-                    name: <span><Icon type="file"/>{response.data.name}</span>,
+                    name: <span><Icon type="case"/>{response.data.name}</span>,
                     content: <TestCaseTab defaultMode="edit" testCaseId={response.data.id}/>
                 }
             );

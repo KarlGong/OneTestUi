@@ -33,6 +33,13 @@
     color: #e6c841;
 }
 
+.ant-tree .ant-tree-center_docu:after,
+.ant-tree .ant-tree-bottom_docu:after {
+    content: "\E307" !important;
+    font-size: 13px !important;
+    color: #4baff6;
+}
+
 .ant-tree .ant-tree-node-content-wrapper {
     min-width: 50px;
 }

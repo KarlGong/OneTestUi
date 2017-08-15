@@ -1,10 +1,10 @@
 
 @font-face {font-family: "anticon";
-  src: url('iconfont.eot?t=1500365216075'); /* IE9*/
-  src: url('iconfont.eot?t=1500365216075#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1500365216075') format('woff'), /* chrome, firefox */
-  url('iconfont.ttf?t=1500365216075') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=1500365216075#anticon') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=1502789345630'); /* IE9*/
+  src: url('iconfont.eot?t=1502789345630#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1502789345630') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1502789345630') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1502789345630#anticon') format('svg'); /* iOS 4.1- */
 }
 
 .anticon {
@@ -14,11 +14,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.anticon-project:before { content: "\ea06"; }
+
 .anticon-insert-table:before { content: "\e91e"; }
 
 .anticon-editor-code:before { content: "\ea77"; }
 
 .anticon-paste:before { content: "\ee27"; }
+
+.anticon-case:before { content: "\e307"; }
 
 .anticon-delete-column:before { content: "\e7f5"; }
 
