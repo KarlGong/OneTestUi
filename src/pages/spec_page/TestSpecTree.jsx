@@ -119,7 +119,7 @@ export default class TestSpecTree extends Component {
     };
 
     loadChildren = (oldTestNode) => {
-        return axios.get("/api/node/children", {params: {parentId: oldTestNode.id}}).then(function (response) {
+        return axios.get("/api/node/" + oldTestNode.id + "/children").then(function (response) {
             let responseChildren = response.data;
             if (oldTestNode.children.length) {
                 responseChildren.map((responseChild, index) => {
