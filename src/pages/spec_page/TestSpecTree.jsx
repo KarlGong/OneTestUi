@@ -1,17 +1,16 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {render, unmountComponentAtNode} from "react-dom";
 import {observable, action, toJS, runInAction} from "mobx";
 import {Layout, Menu, Icon, Tree, Spin, Popover, Modal, message} from "antd";
 import clipboard from "~/utils/clipboard";
 import axios from "axios";
 import event from "~/utils/event";
-import contextMenu from "~/utils/contextMenu";
+import contextMenu from "~/components/contextMenu";
 import TestCaseTab from "~/components/testcase/TestCaseTab";
 import TestSuiteTab from "~/components/testsuite/TestSuiteTab";
 import TestProjectTab from "~/components/testproject/TestProjectTab";
-import addTestCaseModal from "~/utils/addTestCaseModal";
-import addTestSuiteModal from "~/utils/addTestSuiteModal";
+import addTestCaseModal from "~/components/addTestCaseModal";
+import addTestSuiteModal from "~/components/addTestSuiteModal";
 
 @observer
 export default class TestSpecTree extends Component {
@@ -74,7 +73,7 @@ export default class TestSpecTree extends Component {
 
     onDragEnter = (info) => {
         let testNode = info.node.props.data;
-        if (testNode.type !== "case" && this.dragNode.props.data.id !== info.node.props.data.id) {
+        if (testNode.type !== "case" && this.dragNode.props.data.id !== testNode.id) {
             this.loadChildren(testNode);
         }
     };
@@ -99,11 +98,8 @@ export default class TestSpecTree extends Component {
                     if (dragTestNode.parent.id === targetTestNode.parent.id) {
                         this.loadChildren(dragTestNode.parent);
                     } else {
-                        if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
-                            this.loadChildren(dragTestNode.parent).then(() => this.loadChildren(targetTestNode.parent));
-                        } else {
-                            this.loadChildren(targetTestNode.parent).then(() => this.loadChildren(dragTestNode.parent));
-                        }
+                        this.loadChildren(dragTestNode.parent);
+                        this.loadChildren(targetTestNode.parent);
                     }
                 });
             } else { // drop to test suite
@@ -111,11 +107,8 @@ export default class TestSpecTree extends Component {
                     toParentId: targetTestNode.id,
                     toPosition: -1
                 }).then((response) => {
-                    if (info.dragNode.props.pos.indexOf(info.node.props.pos) !== -1) {
-                        this.loadChildren(dragTestNode.parent).then(() => this.loadChildren(targetTestNode));
-                    } else {
-                        this.loadChildren(targetTestNode).then(() => this.loadChildren(dragTestNode.parent));
-                    }
+                    this.loadChildren(dragTestNode.parent);
+                    this.loadChildren(targetTestNode);
                 });
             }
         }
@@ -125,22 +118,24 @@ export default class TestSpecTree extends Component {
         this.dragNode = null;
     };
 
-    loadChildren = (testNode) => {
-        return axios.get("/api/node/" + testNode.id + "/children").then(function (response) {
-            if (testNode.children.length) {
-                response.data.map((responseTestNode) => {
-                    if (responseTestNode.type !== "case") {
-                        let loadedChildTestSuites = testNode.children.filter((node) => node.id === responseTestNode.id && node.type === responseTestNode.type);
-                        if (loadedChildTestSuites.length) {
-                            responseTestNode.children = loadedChildTestSuites[0].children;
+    loadChildren = (oldTestNode) => {
+        return axios.get("/api/node/children", {params: {parentId: oldTestNode.id}}).then(function (response) {
+            let responseChildren = response.data;
+            if (oldTestNode.children.length) {
+                responseChildren.map((responseChild, index) => {
+                    if (responseChild.type !== "case") {
+                        let matchedChildren = oldTestNode.children.filter((node) => node.id === responseChild.id);
+                        if (matchedChildren.length) {
+                            matchedChildren[0].name = responseChildren[index].name;
+                            matchedChildren[0].parentId = responseChildren[index].parentId;
+                            matchedChildren[0].position = responseChildren[index].position;
+                            responseChildren[index] = matchedChildren[0];
                         }
                     }
                 });
-                testNode.children = response.data;
-            } else {
-                testNode.children = response.data;
             }
-            testNode.children.map((child) => child.parent = testNode);
+            oldTestNode.children = responseChildren;
+            oldTestNode.children.map((child) => child.parent = oldTestNode);
         });
     };
 
