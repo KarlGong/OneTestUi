@@ -2,10 +2,19 @@ import React from "react";
 import {render} from "react-dom";
 import {AppContainer} from "react-hot-loader";
 import {observable} from "mobx";
-import {Layout, Menu} from "antd";
+import {Layout, Menu, message} from "antd";
+import axios from "axios";
 import SpecPage from "./pages/spec_page/Index";
 import "./assets/fonts/extra-iconfont/iconfont.css";
 import "./index.css";
+import alert from "~/components/alert";
+
+axios.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    alert.error(error.message);
+    return Promise.reject(error);
+});
 
 render(
     <AppContainer>

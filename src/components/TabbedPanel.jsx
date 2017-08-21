@@ -14,16 +14,16 @@ export default class TabbedPanel extends Component {
     @observable activePanelKey = "view";
     disposers = [];
 
-    componentDidMount() {
-        this.disposers.push(event.on("TabbedPanel.addPanel", this.addPanel.bind(this)));
-        this.disposers.push(event.on("TabbedPanel.addPinnedPanel", this.addPinnedPanel.bind(this)));
-    }
+    componentDidMount = () => {
+        this.disposers.push(event.on("TabbedPanel.addPanel", this.addPanel));
+        this.disposers.push(event.on("TabbedPanel.addPinnedPanel", this.addPinnedPanel));
+    };
 
-    componentWillUnMount() {
+    componentWillUnMount = () => {
         this.disposers.map((disposer) => disposer());
-    }
+    };
 
-    render() {
+    render = () => {
         return (<div className="tabbed-panel">
                 <Tabs
                     hideAdd
@@ -38,27 +38,27 @@ export default class TabbedPanel extends Component {
                 </Tabs>
             </div>
         );
-    }
+    };
 
-    selectPanel(key) {
+    selectPanel = (key) => {
         this.activePanelKey = key;
-    }
+    };
 
-    addPanel(panel) {
+    addPanel = (panel) => {
         this.activePanelKey = panel.key;
         for (let i = 0; i < this.panels.length; i++) {
             if (this.panels[i].key === panel.key) return;
         }
         this.panels.push(panel);
-    }
+    };
 
-    addPinnedPanel(panel) {
+    addPinnedPanel = (panel) => {
         this.activePanelKey = panel.key;
         this.pinnedPanel = panel;
-    }
+    };
 
     @action
-    removePanel(key, action) {
+    removePanel = (key, action) => {
         if (action === "remove") {
             if (this.activePanelKey === key) {
                 let lastIndex = -1;
