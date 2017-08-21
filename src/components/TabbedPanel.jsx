@@ -33,7 +33,7 @@ export default class TabbedPanel extends Component {
                     hideAdd
                     type="editable-card"
                     activeKey={this.activePanelKey}
-                    onChange={this.selectPanel}
+                    onTabClick={this.selectPanel}
                     onEdit={(key, action) => action === "remove" && this.removePanel(key)}
                 >
                     <Tabs.TabPane tab={<span><Icon type="eye-o" />&nbsp;</span>} key={this.pinnedPanel.key} closable={false}>{this.pinnedPanel.content}</Tabs.TabPane>
