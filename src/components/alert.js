@@ -25,7 +25,7 @@ class Alerts extends Component {
     render = () => {
         return <div style={{position: "fixed", top: 0, left: "50%", transform: "translate(-50%)"}}>
             {this.alerts.map((alert, i) =>
-                <Alert style={{marginTop: "5px"}} key={i} type={alert.type} message={alert.message} description={alert.description} closable showIcon/>)}
+                <Alert style={{marginTop: "16px"}} key={i} type={alert.type} message={alert.message} description={alert.description} closable showIcon/>)}
         </div>
     };
 }

@@ -285,6 +285,8 @@ export default class TestSpecTree extends Component {
                     message.success("The test suite is deleted successfully");
                     close();
                     this.loadChildren(testSuite.parent);
+                    event.emit("TabbedPanel.removePanel", "suite-" + testSuite.id);
+                    event.emit("TabbedPanel.removePinnedPanel", "pinned-suite-" + testSuite.id);
                 })
             }
         })
@@ -384,6 +386,8 @@ export default class TestSpecTree extends Component {
                     message.success("The test case is deleted successfully");
                     close();
                     this.loadChildren(testCase.parent);
+                    event.emit("TabbedPanel.removePanel", "case-" + testCase.id);
+                    event.emit("TabbedPanel.removePinnedPanel", "pinned-case-" + testCase.id);
                 })
             }
         })
