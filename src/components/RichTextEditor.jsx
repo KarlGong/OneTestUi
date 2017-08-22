@@ -327,12 +327,12 @@ class RichTextEditor extends Component {
     onClickMark = (e, type) => {
         e.preventDefault();
         let {state} = this.state;
-        let transform = state.transform();
+        const transform = state.transform();
         let hasMark = false;
 
         state.marks.map((mark) => {
             if (mark.type === type) {
-                transform = transform.removeMark(mark);
+                transform.removeMark(mark);
                 hasMark = true;
             }
         });
@@ -367,11 +367,11 @@ class RichTextEditor extends Component {
     onClickColor = (e, color) => {
         e.preventDefault();
         let {state} = this.state;
-        let transform = state.transform();
+        const transform = state.transform();
 
         state.marks.map((mark) => {
             if (mark.type === "color") {
-                transform = transform.removeMark(mark);
+                transform.removeMark(mark);
             }
         });
 
