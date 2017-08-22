@@ -3,7 +3,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {observable} from "mobx";
 import cs from "classnames";
-import {Editor, Raw, Mark, Plain, Block, Html} from "slate";
+import {Editor, Raw, Mark, Plain, Block, Html, Data} from "slate";
 import {Icon} from "antd";
 import SlateTable from "slate-edit-table";
 import "./RichTextEditor.css";
@@ -43,7 +43,7 @@ const schema = {
         bold: ({mark, children}) => <span style={{fontWeight: "bold"}}>{children}</span>,
         italic: ({mark, children}) => <span style={{fontStyle: "italic"}}>{children}</span>,
         underlined: ({mark, children}) => <span style={{textDecoration: "underline"}}>{children}</span>,
-        color: ({mark, children}) => <span style={{color: mark.data.color}}>{children}</span>
+        color: ({mark, children}) => <span style={{color: mark.data.get("color")}}>{children}</span>
     }
 };
 
@@ -109,7 +109,7 @@ const rules = [
                     return {
                         kind: "mark",
                         type: el.attribs.type,
-                        data: el.attribs,
+                        data: Data.create(el.attribs),
                         nodes: next(el.children)
                     }
             }
@@ -138,7 +138,7 @@ const rules = [
                     case "table-cell":
                         return <td>{children}</td>;
                 }
-            } else {
+            } else if (object.kind === "mark"){
                 switch (object.type) {
                     case "bold":
                         return <span style={{fontWeight: "bold"}} type="bold">{children}</span>;
@@ -147,8 +147,8 @@ const rules = [
                     case "underlined":
                         return <span style={{textDecoration: "underline"}} type="underlined">{children}</span>;
                     case "color":
-                        return <span style={{color: object.data.color}} type="color"
-                                     color={object.data.color}>{children}</span>;
+                        return <span style={{color: object.data.get("color")}} type="color"
+                                     color={object.data.get("color")}>{children}</span>;
                 }
             }
         }
@@ -369,10 +369,9 @@ class RichTextEditor extends Component {
         state = transform
             .addMark(new Mark({
                 type: "color",
-                data: {
+                data: Data.create({
                     color: color,
-                    toJSON: () => color // fix mark.data is not a function issue
-                }
+                })
             }))
             .apply();
 
