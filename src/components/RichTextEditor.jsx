@@ -37,7 +37,7 @@ const schema = {
                 <tbody {...props.attributes}>{props.children}</tbody>
             </table>,
         "table-row": props => <tr {...props.attributes}>{props.children}</tr>,
-        "table-cell": (props) => <td {...props.attributes}>{props.children}</td>
+        "table-cell": props => <td {...props.attributes}>{props.children}</td>
     },
     marks: {
         bold: ({mark, children}) => <span style={{fontWeight: "bold"}}>{children}</span>,
@@ -138,7 +138,7 @@ const rules = [
                     case "table-cell":
                         return <td>{children}</td>;
                 }
-            } else if (object.kind === "mark"){
+            } else if (object.kind === "mark") {
                 switch (object.type) {
                     case "bold":
                         return <span style={{fontWeight: "bold"}} type="bold">{children}</span>;
@@ -342,7 +342,7 @@ class RichTextEditor extends Component {
         }
         state = transform.apply();
 
-        this.setState({state})
+        this.onChange(state)
     };
 
     /**
@@ -384,7 +384,7 @@ class RichTextEditor extends Component {
             }))
             .apply();
 
-        this.setState({state})
+        this.onChange(state)
     };
 
     renderColorButton = (color) => {
@@ -452,7 +452,7 @@ class RichTextEditor extends Component {
         }
 
         state = transform.apply();
-        this.setState({state});
+        this.onChange(state);
     };
 
     /**
@@ -496,7 +496,6 @@ class RichTextEditor extends Component {
 
     onRemoveColumn = () => {
         let {state} = this.state;
-
         this.onChange(
             slateTable.transforms.removeColumn(state.transform()).apply()
         );
@@ -519,8 +518,7 @@ class RichTextEditor extends Component {
     };
 
     renderTableButtons = () => {
-        let {state} = this.state;
-        let isTable = slateTable.utils.isSelectionInTable(state);
+        let isTable = this.isSelectionInTable();
 
         if (!isTable) {
             return (
@@ -548,6 +546,23 @@ class RichTextEditor extends Component {
                     </span>
                 </span>
             );
+        }
+    };
+
+    isSelectionInTable = () => {
+        let {state} = this.state;
+        if (!state.selection.startKey) return false;
+
+        let startBlock = state.startBlock;
+
+        while (true) {
+            if (startBlock.kind === "document") {
+                return false;
+            }
+            if (startBlock.type === "table-cell") {
+                return true;
+            }
+            startBlock = state.document.getParent(startBlock.key);
         }
     };
 
