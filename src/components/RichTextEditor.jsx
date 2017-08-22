@@ -476,7 +476,7 @@ class RichTextEditor extends Component {
     onInsertTable = () => {
         let {state} = this.state;
         this.onChange(
-            slateTable.transforms.insertTable(state.transform()).apply()
+            slateTable.transforms.insertTable(state.transform(), 3, 3).apply()
         );
     };
 
@@ -512,7 +512,7 @@ class RichTextEditor extends Component {
         let {state} = this.state;
         let newState = slateTable.transforms.removeTable(state.transform()).apply();
         if (!newState.document.nodes.size) {
-            newState = Plain.deserialize("");
+            newState = htmlSerializer.deserialize("<p></p>");
         }
         this.onChange(newState);
     };
@@ -559,7 +559,7 @@ class RichTextEditor extends Component {
             if (startBlock.kind === "document") {
                 return false;
             }
-            if (startBlock.type === "table-cell") {
+            if (startBlock.type === "table") {
                 return true;
             }
             startBlock = state.document.getParent(startBlock.key);
