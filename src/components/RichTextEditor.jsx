@@ -109,7 +109,7 @@ const rules = [
                     return {
                         kind: "mark",
                         type: el.attribs.type,
-                        data: Data.create(el.attribs),
+                        data: el.attribs,
                         nodes: next(el.children)
                     }
             }
@@ -327,11 +327,20 @@ class RichTextEditor extends Component {
     onClickMark = (e, type) => {
         e.preventDefault();
         let {state} = this.state;
+        let transform = state.transform();
+        let hasMark = false;
 
-        state = state
-            .transform()
-            .toggleMark(type)
-            .apply();
+        state.marks.map((mark) => {
+            if (mark.type === type) {
+                transform = transform.removeMark(mark);
+                hasMark = true;
+            }
+        });
+
+        if (!hasMark) {
+            transform.addMark(type);
+        }
+        state = transform.apply();
 
         this.setState({state})
     };
