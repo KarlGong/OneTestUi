@@ -43,6 +43,6 @@
     "react-dom": "^15.6.1",
     "react-split-pane": "^0.1.66",
     "slate": "^0.20.4",
-    "slate-edit-table": "^0.10.1"
+    "@exah/slate-edit-table": "^0.11.1"
   }
 }

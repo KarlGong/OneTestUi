@@ -5,7 +5,7 @@ import {observable} from "mobx";
 import cs from "classnames";
 import {Editor, Raw, Mark, Plain, Block, Html, Data} from "slate";
 import {Icon} from "antd";
-import SlateTable from "slate-edit-table";
+import SlateTable from "@exah/slate-edit-table";
 import "./RichTextEditor.css";
 
 /**
@@ -473,25 +473,35 @@ class RichTextEditor extends Component {
         )
     };
 
+    processNewCells = (state) => {
+        let transform = state.transform();
+        let tableCells = state.document.filterDescendants((node) => node.type === "table-cell");
+        tableCells.map((tableCell) => {
+            let text = tableCell.nodes.get(0);
+            if (text.kind === "text") {
+                transform.wrapBlockByKey(text.key, DEFAULT_NODE);
+            }
+        });
+        return transform.apply();
+    };
+
     onInsertTable = () => {
         let {state} = this.state;
-        this.onChange(
-            slateTable.transforms.insertTable(state.transform(), 3, 3).apply()
-        );
+        let newState = slateTable.transforms.insertTable(state.transform(), 3, 3).apply();
+        this.onChange(this.processNewCells(newState));
     };
 
     onInsertColumn = () => {
         let {state} = this.state;
-        this.onChange(
-            slateTable.transforms.insertColumn(state.transform()).apply()
-        );
+        let newState = slateTable.transforms.insertColumn(state.transform()).apply();
+        this.onChange(this.processNewCells(newState));
     };
 
     onInsertRow = () => {
         let {state} = this.state;
-        this.onChange(
-            slateTable.transforms.insertRow(state.transform()).apply()
-        );
+        let newState = slateTable.transforms.insertRow(state.transform()).apply();
+        this.onChange(this.processNewCells(newState))
+        ;
     };
 
     onRemoveColumn = () => {
@@ -518,7 +528,8 @@ class RichTextEditor extends Component {
     };
 
     renderTableButtons = () => {
-        let isTable = this.isSelectionInTable();
+        let {state} = this.state;
+        let isTable = slateTable.utils.isSelectionInTable(state);
 
         if (!isTable) {
             return (
@@ -546,23 +557,6 @@ class RichTextEditor extends Component {
                     </span>
                 </span>
             );
-        }
-    };
-
-    isSelectionInTable = () => {
-        let {state} = this.state;
-        if (!state.selection.startKey) return false;
-
-        let startBlock = state.startBlock;
-
-        while (true) {
-            if (startBlock.kind === "document") {
-                return false;
-            }
-            if (startBlock.type === "table") {
-                return true;
-            }
-            startBlock = state.document.getParent(startBlock.key);
         }
     };
 
