@@ -34,7 +34,7 @@ export default class TestSpecTree extends Component {
                 return <Tree.TreeNode data={item} key={item.id} title={item.name} isLeaf/>;
             } else { // test project and test suite
                 return <Tree.TreeNode data={item} key={item.id}
-                                      title={item.name}>{loop(item.children)}</Tree.TreeNode>;
+                                      title={item.name + " (" + item.count + ")"}>{loop(item.children)}</Tree.TreeNode>;
             }
         });
 
@@ -119,23 +119,35 @@ export default class TestSpecTree extends Component {
     };
 
     loadChildren = (oldTestNode) => {
-        return axios.get("/api/node/" + oldTestNode.id + "/children").then(function (response) {
-            let responseChildren = response.data;
-            if (oldTestNode.children.length) {
-                responseChildren.map((responseChild, index) => {
-                    if (responseChild.type !== "case") {
-                        let matchedChildren = oldTestNode.children.filter((node) => node.id === responseChild.id);
-                        if (matchedChildren.length) {
-                            matchedChildren[0].name = responseChildren[index].name;
-                            matchedChildren[0].parentId = responseChildren[index].parentId;
-                            matchedChildren[0].position = responseChildren[index].position;
-                            responseChildren[index] = matchedChildren[0];
+        return axios.get("/api/node/" + oldTestNode.id).then(function (response) {
+            runInAction(() => {
+                oldTestNode.name = response.data.name;
+                oldTestNode.parentId = response.data.parentId;
+                oldTestNode.position = response.data.position;
+                oldTestNode.count = response.data.count;
+            });
+
+            return axios.get("/api/node/" + oldTestNode.id + "/children");
+        }).then(function (response) {
+            runInAction(() => {
+                let responseChildren = response.data;
+                if (oldTestNode.children.length) {
+                    responseChildren.map((responseChild, index) => {
+                        if (responseChild.type !== "case") {
+                            let matchedChildren = oldTestNode.children.filter((node) => node.id === responseChild.id);
+                            if (matchedChildren.length) {
+                                matchedChildren[0].name = responseChildren[index].name;
+                                matchedChildren[0].parentId = responseChildren[index].parentId;
+                                matchedChildren[0].position = responseChildren[index].position;
+                                // do not need count since grandchildren will not be refreshed
+                                responseChildren[index] = matchedChildren[0];
+                            }
                         }
-                    }
-                });
-            }
-            oldTestNode.children = responseChildren;
-            oldTestNode.children.map((child) => child.parent = oldTestNode);
+                    });
+                }
+                oldTestNode.children = responseChildren;
+                oldTestNode.children.map((child) => child.parent = oldTestNode);
+            });
         });
     };
 
