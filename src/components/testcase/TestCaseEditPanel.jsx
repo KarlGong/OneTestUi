@@ -30,8 +30,6 @@ export default class TestCaseEditPanel extends Component {
             runInAction(() => {
                 this.testCase = response.data;
                 this.testCase.testSteps.map((testStep) => testStep.guid = guid());
-                this.testCase.executionType = this.testCase.executionType.toString();
-                this.testCase.importance = this.testCase.importance.toString();
                 this.props.onLoadingFinish();
                 this.loading = false;
             });
@@ -44,7 +42,7 @@ export default class TestCaseEditPanel extends Component {
                 <Form layout="vertical">
                     <Form.Item label="Name" validateStatus="error">
                         <Input key={this.loading} size="default" style={{width: "45%"}}
-                               defaultValue={untracked(() => this.testCase.name)} // it's a trick to untrack changes here
+                               defaultValue={untracked(() => this.testCase.name)}
                                onChange={(e) => this.testCase.name = e.target.value}/>
                     </Form.Item>
                     <Form.Item label="Summary">
@@ -103,14 +101,14 @@ export default class TestCaseEditPanel extends Component {
                 <Form layout="inline" style={{display: "flex", alignItems: "center", marginTop: "30px"}}>
                     <Form.Item label="Execution Type">
                         <Radio.Group key={this.loading} size="default"
-                                     defaultValue={this.testCase.executionType}
+                                     defaultValue={untracked(() => this.testCase.executionType)}
                                      onChange={(e) => this.testCase.executionType = e.target.value}>
                             {Object.keys(executionMap).map((k) =>
                                 <Radio.Button key={k} value={k}>{executionMap[k]}</Radio.Button>)}
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item label="Importance">
-                        <Select key={this.loading} size="default" defaultValue={this.testCase.importance}
+                        <Select key={this.loading} size="default" defaultValue={untracked(() => this.testCase.importance)}
                                 style={{width: "100px"}} onChange={(value) => this.testCase.importance = value}>
                             {Object.keys(importanceMap).map((k) =>
                                 <Select.Option key={k} value={k}>{importanceMap[k]}</Select.Option>)}
@@ -118,7 +116,7 @@ export default class TestCaseEditPanel extends Component {
                     </Form.Item>
                     <Form.Item label="Tags">
                         <Select key={this.loading} size="default" mode="tags" notFoundContent=""
-                                defaultValue={this.testCase.tags.map((tag) => tag.value)} style={{width: "400px"}}
+                                defaultValue={untracked(() => this.testCase.tags).map((tag) => tag.value)} style={{width: "400px"}}
                                 onChange={(values) => this.testCase.tags = values.map((value) => {return {value}})}
                                 onSearch={this.searchTag}
                                 onFocus={this.searchTag.bind(this, "")}>

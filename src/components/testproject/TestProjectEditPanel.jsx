@@ -44,7 +44,7 @@ export default class TestProjectEditPanel extends Component {
                 <Form layout="vertical">
                     <Form.Item label="Name" validateStatus="error">
                         <Input key={this.loading} size="default" style={{width: "45%"}}
-                               defaultValue={untracked(() => this.testProject.name)} // it's a trick to untrack changes here
+                               defaultValue={untracked(() => this.testProject.name)}
                                onChange={(e) => this.testProject.name = e.target.value}/>
                     </Form.Item>
                     <Form.Item label="Description">

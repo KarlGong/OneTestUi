@@ -40,7 +40,7 @@ export default class TestSuiteEditPanel extends Component {
                 <Form layout="vertical">
                     <Form.Item label="Name" validateStatus="error">
                         <Input key={this.loading} size="default" style={{width: "45%"}}
-                               defaultValue={untracked(() => this.testSuite.name)} // it's a trick to untrack changes here
+                               defaultValue={untracked(() => this.testSuite.name)}
                                onChange={(e) => this.testSuite.name = e.target.value}/>
                     </Form.Item>
                     <Form.Item label="Description">
