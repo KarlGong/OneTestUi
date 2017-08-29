@@ -6,6 +6,7 @@ import axios from "axios";
 import RichTextEditor from "~/components/RichTextEditor";
 import guid from "~/utils/guid";
 import clipboard from "~/utils/clipboard";
+import Validator from "~/utils/Validator";
 import {executionMap, importanceMap} from "~/utils/store";
 import "./TestCaseEditPanel.css";
 
@@ -14,6 +15,7 @@ export default class TestCaseEditPanel extends Component {
     @observable testCase = {executionType: "manual", importance: "medium", testSteps: [], tags: []};
     @observable loading = false;
     @observable possibleTags = [];
+    @observable validator = null;
 
     static defaultProps = {
         testCaseId: null,
@@ -32,6 +34,9 @@ export default class TestCaseEditPanel extends Component {
                 this.testCase.testSteps.map((testStep) => testStep.guid = guid());
                 this.props.onLoadingFinish();
                 this.loading = false;
+                this.validator = new Validator(this.testCase, {
+                    name: {required: true}
+                });
             });
         })
     };
@@ -40,10 +45,14 @@ export default class TestCaseEditPanel extends Component {
         return (
             <div className="test-case-editor">
                 <Form layout="vertical">
-                    <Form.Item label="Name" validateStatus="error">
+                    <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
+                        help={this.validator && this.validator.results.name.message}>
                         <Input key={this.loading} size="default" style={{width: "45%"}}
-                               defaultValue={untracked(() => this.testCase.name)}
-                               onChange={(e) => this.testCase.name = e.target.value}/>
+                               defaultValue={this.testCase.name}
+                               onChange={(e) => {
+                                   this.testCase.name = e.target.value;
+                                   this.validator.validateField("name");
+                               }}/>
                     </Form.Item>
                     <Form.Item label="Summary">
                         <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testCase.summary)}
@@ -188,9 +197,13 @@ export default class TestCaseEditPanel extends Component {
     };
 
     save = () => {
-        this.props.onSavingStart();
-        axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {
-            this.props.onSavingFinish();
-        });
+        this.validator.validate(
+            () => {
+                this.props.onSavingStart();
+                axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {
+                    this.props.onSavingFinish();
+                });
+            }
+        );
     }
 }
