@@ -28,11 +28,12 @@ export default class Validator {
                 Object.keys(fields).map((field) => {
                     this._results[field] = {status: "error", message: fields[field][0].message}
                 });
+                this.results = this._results;
                 fail && fail(this._results);
             } else {
+                this.results = this._results;
                 success && success(this._results);
             }
-            this.results = this._results;
         })
     };
 
@@ -41,12 +42,13 @@ export default class Validator {
         this.validator.validate({[fieldName]: this.subject[fieldName]}, (errors, fields) => {
             if (errors) {
                 this._results[fieldName] = {status: "error", message: errors[0].message};
+                this.results = this._results;
                 fail && fail(this._results[fieldName]);
             } else {
                 this._results[fieldName] = {status: "success", message: null};
+                this.results = this._results;
                 success && success(this._results[fieldName]);
             }
-            this.results = this._results;
         })
     };
 }
