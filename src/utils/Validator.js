@@ -21,30 +21,47 @@ export default class Validator {
     };
 
     validate = (success, fail) => {
-        this.setResults({status: "validating", message: null});
-        this.validator.validate(this.subject, (errors, fields) => {
-            this.setResults({status: "success", message: null});
+        let subject = {};
+        Object.keys(this.subject).filter((fieldName) => {
+            return this._results[fieldName] !== "success";
+        }).map((fieldName) => {
+            subject[fieldName] = this.subject[fieldName];
+            this._results[fieldName] = {status: "validating", message: null};
+        });
+        this.results = this._results;
+        
+        this.validator.validate(subject, (errors, fields) => {
+            Object.keys(subject).map((fieldName) => {
+                this._results[fieldName] = {status: "success", message: null};
+            });
             if (errors) {
-                Object.keys(fields).map((field) => {
-                    this._results[field] = {status: "error", message: fields[field][0].message}
+                // error
+                Object.keys(fields).map((fieldName) => {
+                    this._results[fieldName] = {status: "error", message: fields[fieldName][0].message}
                 });
                 this.results = this._results;
                 fail && fail(this._results);
             } else {
+                // success
                 this.results = this._results;
                 success && success(this._results);
             }
         })
     };
 
-    validateField = (fieldName, success, fail) => {
+    validateField = (fieldName, success, error) => {
+        let subject = {[fieldName]: this.subject[fieldName]};
         this._results[fieldName] = {status: "validating", message: null};
-        this.validator.validate({[fieldName]: this.subject[fieldName]}, (errors, fields) => {
+        this.results = this._results;
+
+        this.validator.validate(subject, (errors, fields) => {
             if (errors) {
+                // error
                 this._results[fieldName] = {status: "error", message: errors[0].message};
                 this.results = this._results;
-                fail && fail(this._results[fieldName]);
+                error && error(this._results[fieldName]);
             } else {
+                // success
                 this._results[fieldName] = {status: "success", message: null};
                 this.results = this._results;
                 success && success(this._results[fieldName]);
