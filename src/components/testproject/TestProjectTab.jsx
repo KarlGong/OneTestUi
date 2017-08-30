@@ -16,7 +16,7 @@ export default class TestProjectTab extends Component {
     @observable mode = this.props.defaultMode;
     @observable loading = false;
     @observable saving = false;
-    editPanel = null;
+    editPanel;
 
     render = () => {
         return (

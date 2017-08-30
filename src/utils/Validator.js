@@ -1,19 +1,22 @@
 import Schema from "async-validator";
+import {observable, runInAction, action, isObservable} from "mobx";
 
 export default class Validator {
-    validator = null;
-    subject = null;
-    results = {};
+    validator;
+    subject;
+    _results = {};
+    @observable results = {};
 
     constructor(subject, descriptor) {
         this.subject = subject;
         this.validator = new Schema(descriptor);
         this.setResults({status: null, message: null});
+        this.results = this._results;
     }
 
     setResults = (result) => {
         Object.keys(this.subject).map((fieldName) => {
-            this.results[fieldName] = result;
+            this._results[fieldName] = result;
         })
     };
 
@@ -23,25 +26,27 @@ export default class Validator {
             this.setResults({status: "success", message: null});
             if (errors) {
                 Object.keys(fields).map((field) => {
-                    this.results[field] = {status: "error", message: fields[field][0].message}
+                    this._results[field] = {status: "error", message: fields[field][0].message}
                 });
-                fail && fail(this.results);
+                fail && fail(this._results);
             } else {
-                success && success(this.results);
+                success && success(this._results);
             }
+            this.results = this._results;
         })
     };
 
     validateField = (fieldName, success, fail) => {
-        this.results[fieldName] = {status: "validating", message: null};
+        this._results[fieldName] = {status: "validating", message: null};
         this.validator.validate({[fieldName]: this.subject[fieldName]}, (errors, fields) => {
             if (errors) {
-                this.results[fieldName] = {status: "error", message: errors[0].message};
-                fail && fail(this.results[fieldName]);
+                this._results[fieldName] = {status: "error", message: errors[0].message};
+                fail && fail(this._results[fieldName]);
             } else {
-                this.results[fieldName] = {status: "success", message: null};
-                success && success(this.results[fieldName]);
+                this._results[fieldName] = {status: "success", message: null};
+                success && success(this._results[fieldName]);
             }
+            this.results = this._results;
         })
     };
 }

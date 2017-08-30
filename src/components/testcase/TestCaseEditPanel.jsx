@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {observable, toJS, untracked, runInAction, action} from "mobx";
+import {observable, toJS, untracked, runInAction, action, isObservableMap} from "mobx";
 import {Spin, Row, Col, Form, Button, Icon, Input, message, Popconfirm, Select, Radio} from "antd";
 import axios from "axios";
 import RichTextEditor from "~/components/RichTextEditor";
@@ -15,7 +15,7 @@ export default class TestCaseEditPanel extends Component {
     @observable testCase = {executionType: "manual", importance: "medium", testSteps: [], tags: []};
     @observable loading = false;
     @observable possibleTags = [];
-    @observable validator = null;
+    @observable validator;
 
     static defaultProps = {
         testCaseId: null,
@@ -46,9 +46,9 @@ export default class TestCaseEditPanel extends Component {
             <div className="test-case-editor">
                 <Form layout="vertical">
                     <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
-                        help={this.validator && this.validator.results.name.message}>
+                               help={this.validator && this.validator.results.name.message}>
                         <Input key={this.loading} size="default" style={{width: "45%"}}
-                               defaultValue={this.testCase.name}
+                               defaultValue={untracked(() => this.testCase.name)}
                                onChange={(e) => {
                                    this.testCase.name = e.target.value;
                                    this.validator.validateField("name");

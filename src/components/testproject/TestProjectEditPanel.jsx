@@ -7,12 +7,14 @@ import RichTextEditor from "~/components/RichTextEditor";
 import guid from "~/utils/guid";
 import clipboard from "~/utils/clipboard";
 import {executionMap, importanceMap} from "~/utils/store";
+import Validator from "~/utils/Validator";
 import "./TestProjectEditPanel.css";
 
 @observer
 export default class TestProjectEditPanel extends Component {
     @observable testProject = {};
     @observable loading = false;
+    @observable validator;
 
     static defaultProps = {
         testProjectId: null,
@@ -34,6 +36,9 @@ export default class TestProjectEditPanel extends Component {
                 this.testProject = response.data;
                 this.props.onLoadingFinish();
                 this.loading = false;
+                this.validator = new Validator(this.testProject, {
+                    name: {required: true}
+                });
             });
         })
     };
@@ -42,10 +47,14 @@ export default class TestProjectEditPanel extends Component {
         return (
             <div className="test-project-editor">
                 <Form layout="vertical">
-                    <Form.Item label="Name" validateStatus="error">
+                    <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
+                        help={this.validator && this.validator.results.name.message}>
                         <Input key={this.loading} size="default" style={{width: "45%"}}
                                defaultValue={untracked(() => this.testProject.name)}
-                               onChange={(e) => this.testProject.name = e.target.value}/>
+                               onChange={(e) => {
+                                   this.testProject.name = e.target.value;
+                                   this.validator.validateField("name");
+                               }}/>
                     </Form.Item>
                     <Form.Item label="Description">
                         <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testProject.description)}
@@ -57,9 +66,13 @@ export default class TestProjectEditPanel extends Component {
     };
 
     save = () => {
-        this.props.onSavingStart();
-        axios.post("/api/project/" + this.props.testProjectId, this.testProject).then((response) => {
-            this.props.onSavingFinish();
-        });
+        this.validator.validate(
+            () => {
+                this.props.onSavingStart();
+                axios.post("/api/project/" + this.props.testProjectId, this.testProject).then((response) => {
+                    this.props.onSavingFinish();
+                });
+            }
+        );
     }
 }

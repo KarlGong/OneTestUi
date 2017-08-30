@@ -16,7 +16,7 @@ import addTestSuiteModal from "~/components/addTestSuiteModal";
 export default class TestSpecTree extends Component {
     @observable testProjects = [];
     @observable loading = false;
-    dragNode = null;
+    dragNode;
 
     componentDidMount = () => {
         this.loading = true;

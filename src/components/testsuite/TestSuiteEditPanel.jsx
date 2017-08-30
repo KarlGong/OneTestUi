@@ -6,6 +6,7 @@ import axios from "axios";
 import RichTextEditor from "~/components/RichTextEditor";
 import guid from "~/utils/guid";
 import clipboard from "~/utils/clipboard";
+import Validator from "~/utils/Validator";
 import {executionMap, importanceMap} from "~/utils/store";
 import "./TestSuiteEditPanel.css";
 
@@ -13,6 +14,7 @@ import "./TestSuiteEditPanel.css";
 export default class TestSuiteEditPanel extends Component {
     @observable testSuite = {};
     @observable loading = false;
+    @observable validator;
 
     static defaultProps = {
         testSuiteId: null,
@@ -30,6 +32,9 @@ export default class TestSuiteEditPanel extends Component {
                 this.testSuite = response.data;
                 this.props.onLoadingFinish();
                 this.loading = false;
+                this.validator = new Validator(this.testSuite, {
+                    name: {required: true}
+                });
             });
         })
     };
@@ -38,10 +43,14 @@ export default class TestSuiteEditPanel extends Component {
         return (
             <div className="test-suite-editor">
                 <Form layout="vertical">
-                    <Form.Item label="Name" validateStatus="error">
+                    <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
+                               help={this.validator && this.validator.results.name.message}>
                         <Input key={this.loading} size="default" style={{width: "45%"}}
                                defaultValue={untracked(() => this.testSuite.name)}
-                               onChange={(e) => this.testSuite.name = e.target.value}/>
+                               onChange={(e) => {
+                                   this.testSuite.name = e.target.value;
+                                   this.validator.validateField("name");
+                               }}/>
                     </Form.Item>
                     <Form.Item label="Description">
                         <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testSuite.description)}
@@ -53,9 +62,13 @@ export default class TestSuiteEditPanel extends Component {
     };
 
     save = () => {
-        this.props.onSavingStart();
-        axios.post("/api/suite/" + this.props.testSuiteId, this.testSuite).then((response) => {
-            this.props.onSavingFinish();
-        });
+        this.validator.validate(
+            () => {
+                this.props.onSavingStart();
+                axios.post("/api/suite/" + this.props.testSuiteId, this.testSuite).then((response) => {
+                    this.props.onSavingFinish();
+                });
+            }
+        );
     }
 }
