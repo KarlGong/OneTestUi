@@ -173,7 +173,6 @@ class RichTextEditor extends Component {
     };
 
     @observable isFocus = false;
-    @observable isToolbarShow = false;
 
     state = {
         state: htmlSerializer.deserialize(this.props.defaultValue || "<p></p>")
@@ -251,18 +250,9 @@ class RichTextEditor extends Component {
                 "view-mode": this.props.viewMode
             }, this.props.className)}
                  style={this.props.style}>
-                {this.renderToggleButton()}
                 {this.renderToolbar()}
                 {this.renderEditor()}
             </div>
-        )
-    };
-
-    renderToggleButton = () => {
-        return ( this.props.viewMode ? null :
-                <div className="toggle-button" onClick={() => this.isToolbarShow = !this.isToolbarShow}>
-                    <Icon type={this.isToolbarShow ? "up" : "ellipsis"}/>
-                </div>
         )
     };
 
@@ -273,7 +263,7 @@ class RichTextEditor extends Component {
      */
 
     renderToolbar = () => {
-        return ( !this.props.viewMode && this.isToolbarShow ?
+        return ( !this.props.viewMode ?
                 <div className="toolbar">
                     {this.renderMarkButton("bold", "editor-b")}
                     {this.renderMarkButton("italic", "editor-i")}

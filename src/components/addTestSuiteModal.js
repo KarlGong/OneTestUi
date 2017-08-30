@@ -50,7 +50,7 @@ class AddTestSuiteModal extends Component {
             <Form layout="vertical">
                 <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
                            help={this.validator && this.validator.results.name.message}>
-                    <Input size="default" onChange={(e) => {
+                    <Input onChange={(e) => {
                         this.testSuite.name = e.target.value;
                         this.validator.validateField("name");
                     }}/>

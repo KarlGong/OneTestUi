@@ -49,7 +49,7 @@ export default class TestProjectEditPanel extends Component {
                 <Form layout="vertical">
                     <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
                         help={this.validator && this.validator.results.name.message}>
-                        <Input key={this.loading} size="default" style={{width: "45%"}}
+                        <Input key={this.loading} style={{width: "45%"}}
                                defaultValue={untracked(() => this.testProject.name)}
                                onChange={(e) => {
                                    this.testProject.name = e.target.value;
