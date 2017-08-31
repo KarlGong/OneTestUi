@@ -15,7 +15,9 @@ export default class TestCaseEditPanel extends Component {
     @observable testCase = {executionType: "manual", importance: "medium", testSteps: [], tags: []};
     @observable loading = false;
     @observable possibleTags = [];
-    @observable validator;
+    @observable validator = new Validator(this.testCase, {
+        name: {required: true}
+    });
 
     static defaultProps = {
         testCaseId: null,
@@ -32,11 +34,9 @@ export default class TestCaseEditPanel extends Component {
             runInAction(() => {
                 this.testCase = response.data;
                 this.testCase.testSteps.map((testStep) => testStep.guid = guid());
+                this.validator.setSubject(this.testCase);
                 this.props.onLoadingFinish();
                 this.loading = false;
-                this.validator = new Validator(this.testCase, {
-                    name: {required: true}
-                });
             });
         })
     };
@@ -45,14 +45,14 @@ export default class TestCaseEditPanel extends Component {
         return (
             <div className="test-case-editor">
                 <Form layout="vertical">
-                    <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
-                               help={this.validator && this.validator.results.name.message}>
+                    <Form.Item label="Name" validateStatus={this.validator.getResult("name").status}
+                               help={this.validator.getResult("name").message}>
                         <Input key={this.loading} style={{width: "45%"}}
                                defaultValue={untracked(() => this.testCase.name)}
                                onChange={(e) => {
                                    this.testCase.name = e.target.value;
-                                   this.validator.validateField("name");
-                               }}/>
+                                   this.validator.resetResult("name");
+                               }} onBlur={() => this.validator.validate("name")}/>
                     </Form.Item>
                     <Form.Item label="Summary">
                         <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testCase.summary)}
@@ -197,7 +197,7 @@ export default class TestCaseEditPanel extends Component {
     };
 
     save = () => {
-        this.validator.validate(
+        this.validator.validateAll(
             () => {
                 this.props.onSavingStart();
                 axios.post("/api/case/" + this.props.testCaseId, this.testCase).then((response) => {

@@ -12,7 +12,7 @@ const target = document.createElement("div");
 document.body.appendChild(target);
 
 function open(parentId, onSuccess) {
-    render(<AddTestSuiteModal parentId={parentId} onSuccess={onSuccess} />, target);
+    render(<AddTestSuiteModal parentId={parentId} onSuccess={onSuccess}/>, target);
 }
 
 function close() {
@@ -23,17 +23,13 @@ function close() {
 class AddTestSuiteModal extends Component {
     @observable loading = false;
     testSuite = {name: null, description: null};
-    @observable validator;
+    @observable validator = new Validator(this.testSuite, {
+        name: {required: true}
+    });
 
     static defaultProps = {
         parentId: null,
         onSuccess: (id, name) => {},
-    };
-
-    componentDidMount = () => {
-        this.validator = new Validator(this.testSuite, {
-            name: {required: true}
-        });
     };
 
     render = () => {
@@ -48,12 +44,12 @@ class AddTestSuiteModal extends Component {
             onCancel={this.handleCancel}
         >
             <Form layout="vertical">
-                <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
-                           help={this.validator && this.validator.results.name.message}>
+                <Form.Item label="Name" validateStatus={this.validator.getResult("name").status}
+                           help={this.validator.getResult("name").message}>
                     <Input onChange={(e) => {
                         this.testSuite.name = e.target.value;
-                        this.validator.validateField("name");
-                    }}/>
+                        this.validator.resetResult("name");
+                    }} onBlur={() => this.validator.validate("name")}/>
                 </Form.Item>
                 <Form.Item label="Description">
                     <RichTextEditor onChange={(value) => this.testSuite.description = value}/>
@@ -63,17 +59,21 @@ class AddTestSuiteModal extends Component {
     };
 
     handleOk = () => {
-        this.loading = true;
-        axios.put("/api/suite", {
-            parentId: this.props.parentId,
-            name: this.testSuite.name,
-            description: this.testSuite.description,
-            position: -1
-        }).then((response) => {
-            this.props.onSuccess(response.data);
-            this.loading = false;
-            close();
-        })
+        this.validator.validateAll(
+            () => {
+                this.loading = true;
+                axios.put("/api/suite", {
+                    parentId: this.props.parentId,
+                    name: this.testSuite.name,
+                    description: this.testSuite.description,
+                    position: -1
+                }).then((response) => {
+                    this.props.onSuccess(response.data);
+                    this.loading = false;
+                    close();
+                })
+            }
+        );
     };
 
     handleCancel = () => {

@@ -22,17 +22,13 @@ function close() {
 class AddTestCaseModal extends Component {
     @observable loading = false;
     @observable testCase = {name: null};
-    @observable validator;
+    @observable validator = new Validator(this.testCase, {
+        name: {required: true}
+    });
 
     static defaultProps = {
         parentId: null,
         onSuccess: (id, name) => {}
-    };
-
-    componentDidMount = () => {
-        this.validator = new Validator(this.testCase, {
-            name: {required: true}
-        });
     };
 
     render = () => {
@@ -47,19 +43,19 @@ class AddTestCaseModal extends Component {
             onCancel={this.handleCancel}
         >
             <Form layout="vertical">
-                <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
-                           help={this.validator && this.validator.results.name.message}>
+                <Form.Item label="Name" validateStatus={this.validator.getResult("name").status}
+                           help={this.validator.getResult("name").message}>
                     <Input onChange={(e) => {
                         this.testCase.name = e.target.value;
-                        this.validator.validateField("name");
-                    }}/>
+                        this.validator.resetResult("name");
+                    }} onBlur={() => this.validator.validate("name")}/>
                 </Form.Item>
             </Form>
         </Modal>
     };
 
     handleOk = () => {
-        this.validator.validate(
+        this.validator.validateAll(
             () => {
                 this.loading = true;
                 axios.put("/api/case", {

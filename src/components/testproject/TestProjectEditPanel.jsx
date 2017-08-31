@@ -14,18 +14,16 @@ import "./TestProjectEditPanel.css";
 export default class TestProjectEditPanel extends Component {
     @observable testProject = {};
     @observable loading = false;
-    @observable validator;
+    @observable validator = new Validator(this.testProject, {
+        name: {required: true}
+    });
 
     static defaultProps = {
         testProjectId: null,
-        onLoadingStart: () => {
-        },
-        onLoadingFinish: () => {
-        },
-        onSavingStart: () => {
-        },
-        onSavingFinish: () => {
-        }
+        onLoadingStart: () => {},
+        onLoadingFinish: () => {},
+        onSavingStart: () => {},
+        onSavingFinish: () => {}
     };
 
     componentDidMount = () => {
@@ -34,11 +32,9 @@ export default class TestProjectEditPanel extends Component {
         axios.get("/api/project/" + this.props.testProjectId).then((response) => {
             runInAction(() => {
                 this.testProject = response.data;
+                this.validator.setSubject(this.testProject);
                 this.props.onLoadingFinish();
                 this.loading = false;
-                this.validator = new Validator(this.testProject, {
-                    name: {required: true}
-                });
             });
         })
     };
@@ -47,14 +43,14 @@ export default class TestProjectEditPanel extends Component {
         return (
             <div className="test-project-editor">
                 <Form layout="vertical">
-                    <Form.Item label="Name" validateStatus={this.validator && this.validator.results.name.status}
-                        help={this.validator && this.validator.results.name.message}>
+                    <Form.Item label="Name" validateStatus={this.validator.getResult("name").status}
+                               help={this.validator.getResult("name").message}>
                         <Input key={this.loading} style={{width: "45%"}}
                                defaultValue={untracked(() => this.testProject.name)}
                                onChange={(e) => {
                                    this.testProject.name = e.target.value;
-                                   this.validator.validateField("name");
-                               }}/>
+                                   this.validator.resetResult("name");
+                               }} onBlur={() => this.validator.validate("name")}/>
                     </Form.Item>
                     <Form.Item label="Description">
                         <RichTextEditor key={this.loading} defaultValue={untracked(() => this.testProject.description)}
@@ -66,7 +62,7 @@ export default class TestProjectEditPanel extends Component {
     };
 
     save = () => {
-        this.validator.validate(
+        this.validator.validateAll(
             () => {
                 this.props.onSavingStart();
                 axios.post("/api/project/" + this.props.testProjectId, this.testProject).then((response) => {

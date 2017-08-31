@@ -2,69 +2,103 @@ import Schema from "async-validator";
 import {observable, runInAction, action, isObservable} from "mobx";
 
 export default class Validator {
-    validator;
-    subject;
+    static defaultResult = {status: null, message: null};
+
+    subject = {};
+    descriptor;
     _results = {};
     @observable results = {};
 
     constructor(subject, descriptor) {
-        this.subject = subject;
-        this.validator = new Schema(descriptor);
-        this.setResults({status: null, message: null});
-        this.results = this._results;
+        this.setSubject(subject);
+        this.descriptor = descriptor;
     }
 
-    setResults = (result) => {
-        Object.keys(this.subject).map((fieldName) => {
-            this._results[fieldName] = result;
+    setSubject = (subject) => {
+        this.subject = subject || {};
+    };
+
+    getResult = (fieldName) => {
+        return this.results[fieldName] || Validator.defaultResult;
+    };
+
+    resetResult = (fieldName) => {
+        if (!this._results[fieldName]) return;
+
+        delete this._results[fieldName];
+        this.results = this._results;
+    };
+
+    resetResults = () => {
+        this._results = {};
+        this.results = this._results;
+    };
+
+    setResult = (fieldName, result) => {
+        this._results[fieldName] = result;
+        this.results = this._results;
+    };
+
+    validate = (fieldName, success, error) => {
+        debugger;
+        let subject = {[fieldName]: this.subject[fieldName]};
+        let descriptor = {[fieldName]: this.descriptor[fieldName]};
+        this.setResult(fieldName, {status: "validating", message: null});
+
+        new Schema(descriptor).validate(subject, (errors, fields) => {
+            if (errors) {
+                // error
+                this.setResult(fieldName, {status: "error", message: errors[0].message});
+                error && error(this._results[fieldName]);
+            } else {
+                // success
+                this.setResult(fieldName, {status: "success", message: null});
+                success && success(this._results[fieldName]);
+            }
         })
     };
 
-    validate = (success, fail) => {
+    validateAll = (success, fail) => {
+        let errorFieldNames = [];
+        let unvalidatedFieldNames = [];
+        let validatingFieldNames = [];
+
+        Object.keys(this.subject).map((fieldName) => {
+            switch (this.getResult(fieldName).status) {
+                case null: this.descriptor[fieldName] && unvalidatedFieldNames.push(fieldName); break;
+                case "error": errorFieldNames.push(fieldName); break;
+                case "validating": validatingFieldNames.push(fieldName); break;
+            }
+        });
+
         let subject = {};
-        Object.keys(this.subject).filter((fieldName) => {
-            return this._results[fieldName] !== "success";
-        }).map((fieldName) => {
+        let descriptor = {};
+        unvalidatedFieldNames.map((fieldName) => {
             subject[fieldName] = this.subject[fieldName];
+            descriptor[fieldName] = this.descriptor[fieldName];
             this._results[fieldName] = {status: "validating", message: null};
         });
         this.results = this._results;
-        
-        this.validator.validate(subject, (errors, fields) => {
-            Object.keys(subject).map((fieldName) => {
+
+        new Schema(descriptor).validate(subject, (errors, fields) => {
+            unvalidatedFieldNames.map((fieldName) => {
                 this._results[fieldName] = {status: "success", message: null};
             });
             if (errors) {
-                // error
+                // unvalidated error
                 Object.keys(fields).map((fieldName) => {
                     this._results[fieldName] = {status: "error", message: fields[fieldName][0].message}
                 });
                 this.results = this._results;
                 fail && fail(this._results);
             } else {
-                // success
+                // unvalidated success
                 this.results = this._results;
-                success && success(this._results);
-            }
-        })
-    };
-
-    validateField = (fieldName, success, error) => {
-        let subject = {[fieldName]: this.subject[fieldName]};
-        this._results[fieldName] = {status: "validating", message: null};
-        this.results = this._results;
-
-        this.validator.validate(subject, (errors, fields) => {
-            if (errors) {
-                // error
-                this._results[fieldName] = {status: "error", message: errors[0].message};
-                this.results = this._results;
-                error && error(this._results[fieldName]);
-            } else {
-                // success
-                this._results[fieldName] = {status: "success", message: null};
-                this.results = this._results;
-                success && success(this._results[fieldName]);
+                if (errorFieldNames.length || validatingFieldNames.length) {
+                    fail && fail(this._results);
+                } else {
+                    success && success(this._results);
+                }
             }
         })
     };
