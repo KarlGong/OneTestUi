@@ -1,5 +1,5 @@
 import Schema from "async-validator";
-import {observable, runInAction, action, isObservable} from "mobx";
+import {observable} from "mobx";
 
 export default class Validator {
     static defaultResult = {status: null, message: null};
@@ -40,7 +40,6 @@ export default class Validator {
     };
 
     validate = (fieldName, success, error) => {
-        debugger;
         let subject = {[fieldName]: this.subject[fieldName]};
         let descriptor = {[fieldName]: this.descriptor[fieldName]};
         this.setResult(fieldName, {status: "validating", message: null});
