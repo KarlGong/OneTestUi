@@ -95,20 +95,16 @@ export default class TestSpecTree extends Component {
                     toParentId: targetTestNode.parentId,
                     toPosition: Math.max(targetTestNode.position, info.dropPosition)
                 }).then((response) => {
-                    if (dragTestNode.parent.id === targetTestNode.parent.id) {
-                        this.loadChildren(dragTestNode.parent);
-                    } else {
-                        this.loadChildren(dragTestNode.parent);
-                        this.loadChildren(targetTestNode.parent);
-                    }
+                    this.refreshPath(dragTestNode.parent);
+                    this.refreshPath(targetTestNode.parent);
                 });
             } else { // drop to test suite
                 axios.post("/api/node/" + dragTestNode.id + "/move", {
                     toParentId: targetTestNode.id,
                     toPosition: -1
                 }).then((response) => {
-                    this.loadChildren(dragTestNode.parent);
-                    this.loadChildren(targetTestNode);
+                    this.refreshPath(dragTestNode.parent);
+                    this.refreshPath(targetTestNode);
                 });
             }
         }
@@ -139,7 +135,7 @@ export default class TestSpecTree extends Component {
                                 matchedChildren[0].name = responseChildren[index].name;
                                 matchedChildren[0].parentId = responseChildren[index].parentId;
                                 matchedChildren[0].position = responseChildren[index].position;
-                                // do not need count since grandchildren will not be refreshed
+                                matchedChildren[0].count = responseChildren[index].count;
                                 responseChildren[index] = matchedChildren[0];
                             }
                         }
@@ -151,12 +147,30 @@ export default class TestSpecTree extends Component {
         });
     };
 
+    refreshPath = (testNode) => {
+        let path = [];
+        let currentNode = testNode;
+
+        while (currentNode) {
+            path.push(currentNode);
+            currentNode = currentNode.parent;
+        }
+
+        path.map((tn) => this.loadChildren(tn))
+    };
+
     handleSelect = (selectedKeys, e) => {
         let testNode = e.node.props.data;
         switch (testNode.type) {
-            case "project": this.pinProject(testNode);break;
-            case "suite": this.pinSuite(testNode);break;
-            case "case": this.pinCase(testNode);break;
+            case "project":
+                this.pinProject(testNode);
+                break;
+            case "suite":
+                this.pinSuite(testNode);
+                break;
+            case "case":
+                this.pinCase(testNode);
+                break;
         }
     };
 
@@ -262,7 +276,7 @@ export default class TestSpecTree extends Component {
                     content: <TestSuiteTab defaultMode="edit" testSuiteId={ts.id}/>
                 }
             );
-            this.loadChildren(testNode);
+            this.refreshPath(testNode);
         });
     };
 
@@ -296,7 +310,7 @@ export default class TestSpecTree extends Component {
                 axios.delete("/api/suite/" + testSuite.id).then((response) => {
                     message.success("The test suite is deleted successfully");
                     close();
-                    this.loadChildren(testSuite.parent);
+                    this.refreshPath(testSuite.parent);
                     event.emit("TabbedPanel.removePanel", "suite-" + testSuite.id);
                     event.emit("TabbedPanel.removePinnedPanel", "pinned-suite-" + testSuite.id);
                 })
@@ -334,7 +348,7 @@ export default class TestSpecTree extends Component {
                     content: <TestCaseTab defaultMode="edit" testCaseId={tc.id}/>
                 }
             );
-            this.loadChildren(testNode);
+            this.refreshPath(testNode);
         });
     };
 
@@ -357,7 +371,7 @@ export default class TestSpecTree extends Component {
             return axios.put("/api/case", testCase);
         }).then((response) => {
             message.success("Test case is pasted successfully");
-            this.loadChildren(testSuite);
+            this.refreshPath(testSuite);
             event.emit("TabbedPanel.addPanel",
                 {
                     key: "case-" + response.data.id,
@@ -376,7 +390,7 @@ export default class TestSpecTree extends Component {
             return axios.put("/api/case", testCase);
         }).then((response) => {
             message.success("Test case is duplicated successfully");
-            this.loadChildren(testCase.parent);
+            this.refreshPath(testCase.parent);
             event.emit("TabbedPanel.addPanel",
                 {
                     key: "case-" + response.data.id,
@@ -397,7 +411,7 @@ export default class TestSpecTree extends Component {
                 axios.delete("/api/case/" + testCase.id).then((response) => {
                     message.success("The test case is deleted successfully");
                     close();
-                    this.loadChildren(testCase.parent);
+                    this.refreshPath(testCase.parent);
                     event.emit("TabbedPanel.removePanel", "case-" + testCase.id);
                     event.emit("TabbedPanel.removePinnedPanel", "pinned-case-" + testCase.id);
                 })
