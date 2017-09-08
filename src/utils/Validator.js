@@ -40,11 +40,10 @@ export default class Validator {
     };
 
     validate = (fieldName, success, error) => {
-        let subject = {[fieldName]: this.subject[fieldName]};
         let descriptor = {[fieldName]: this.descriptor[fieldName]};
         this.setResult(fieldName, {status: "validating", message: null});
 
-        new Schema(descriptor).validate(subject, (errors, fields) => {
+        new Schema(descriptor).validate(this.subject, (errors, fields) => {
             if (errors) {
                 // error
                 this.setResult(fieldName, {status: "error", message: errors[0].message});
@@ -70,16 +69,14 @@ export default class Validator {
             }
         });
 
-        let subject = {};
         let descriptor = {};
         unvalidatedFieldNames.map((fieldName) => {
-            subject[fieldName] = this.subject[fieldName];
             descriptor[fieldName] = this.descriptor[fieldName];
             this._results[fieldName] = {status: "validating", message: null};
         });
         this.results = this._results;
 
-        new Schema(descriptor).validate(subject, (errors, fields) => {
+        new Schema(descriptor).validate(this.subject, (errors, fields) => {
             unvalidatedFieldNames.map((fieldName) => {
                 this._results[fieldName] = {status: "success", message: null};
             });
