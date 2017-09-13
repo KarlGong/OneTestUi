@@ -6,6 +6,7 @@ import cs from "classnames";
 import {Editor, Raw, Mark, Plain, Block, Html, Data} from "slate";
 import {Icon} from "antd";
 import SlateTable from "@exah/slate-edit-table";
+import OutsideClickHandler from "react-outside-click-handler";
 import "./RichTextEditor.css";
 
 /**
@@ -245,14 +246,16 @@ class RichTextEditor extends Component {
 
     render = () => {
         return (
-            <div className={cs("rich-text-editor", {
-                "active": this.isFocus,
-                "view-mode": this.props.viewMode
-            }, this.props.className)}
-                 style={this.props.style}>
-                {this.renderToolbar()}
-                {this.renderEditor()}
-            </div>
+            <OutsideClickHandler onOutsideClick={e => this.isFocus = false}>
+                <div className={cs("rich-text-editor", {
+                    "active": this.isFocus,
+                    "view-mode": this.props.viewMode
+                }, this.props.className)}
+                     style={this.props.style}>
+                    {this.renderToolbar()}
+                    {this.renderEditor()}
+                </div>
+            </OutsideClickHandler>
         )
     };
 
@@ -576,9 +579,6 @@ class RichTextEditor extends Component {
                 onKeyDown={this.onKeyDown}
                 onFocus={() => {
                     this.isFocus = true
-                }}
-                onBlur={() => {
-                    this.isFocus = false
                 }}
             />
         )
