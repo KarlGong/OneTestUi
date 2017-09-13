@@ -453,7 +453,9 @@ class RichTextEditor extends Component {
      */
 
     renderBlockButton = (type, icon) => {
-        const isActive = this.hasBlock(type);
+        const {state} = this.state;
+        const isActive = state.blocks.some(node => node.type === type
+        || (node.type === "list-item" && state.document.getClosest(node.key, ancestor => ancestor.type === type)));
         const onMouseDown = e => this.onClickBlock(e, type);
 
         return (
@@ -477,7 +479,13 @@ class RichTextEditor extends Component {
 
     onInsertTable = () => {
         let {state} = this.state;
-        let newState = slateTable.transforms.insertTable(state.transform(), 3, 3).apply();
+        let transform = state.transform();
+        if (this.hasBlock("list-item")) {
+            transform.setBlock(DEFAULT_NODE)
+                .unwrapBlock("bulleted-list")
+                .unwrapBlock("numbered-list");
+        }
+        let newState = slateTable.transforms.insertTable(transform, 3, 3).apply();
         this.onChange(this.processNewCells(newState));
     };
 
