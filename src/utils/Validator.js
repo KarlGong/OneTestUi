@@ -61,9 +61,9 @@ export default class Validator {
         let unvalidatedFieldNames = [];
         let validatingFieldNames = [];
 
-        Object.keys(this.subject).map((fieldName) => {
+        Object.keys(this.descriptor).map((fieldName) => {
             switch (this.getResult(fieldName).status) {
-                case null: this.descriptor[fieldName] && unvalidatedFieldNames.push(fieldName); break;
+                case null: unvalidatedFieldNames.push(fieldName); break;
                 case "error": errorFieldNames.push(fieldName); break;
                 case "validating": validatingFieldNames.push(fieldName); break;
             }
